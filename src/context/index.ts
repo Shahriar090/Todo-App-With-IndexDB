@@ -1,4 +1,8 @@
-import type { TodoContextType } from "@/types/types";
-import { createContext } from "react";
+import type { AuthContextType, TodoContextType } from '@/types/types';
+import { createContext } from 'react';
 
-export const TodoContext = createContext<TodoContextType|null>(null)
+// Todo context
+export const TodoContext = createContext<TodoContextType | null>(null);
+
+// Auth context
+export const AuthContext = createContext<AuthContextType | null>(null);

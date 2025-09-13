@@ -20,10 +20,12 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"dexie": "^4.2.0",
+		"dexie-cloud-addon": "^4.2.0",
 		"dexie-react-hooks": "^4.2.0",
 		"lucide-react": "^0.543.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
+		"styled-components": "^6.1.19",
 		"tailwind-merge": "^3.3.1",
 		"tailwind-scrollbar": "^4.0.2",
 		"tailwindcss": "^4.1.13"

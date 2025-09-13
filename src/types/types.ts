@@ -1,6 +1,6 @@
 // ************************* TODO CONTEXT TYPE **********************************************//
 
-import type { TODO } from '@/db/db';
+import type { TODO, USER } from '@/db/db';
 
 export type TodoContextType = {
 	todos: TODO[];
@@ -10,3 +10,15 @@ export type TodoContextType = {
 };
 
 // ********************************************************************************************//
+
+// ************************* USER CONTEXT TYPE ************************************************//
+
+export type AuthContextType = {
+	user: USER | null;
+	login: (email: string, password: string) => Promise<USER | null>;
+	register: (email: string, password: string) => Promise<USER | null>;
+	logout: () => Promise<void>;
+	getCurrentUser: () => Promise<USER | null>;
+};
+
+// **********************************************************************************************
