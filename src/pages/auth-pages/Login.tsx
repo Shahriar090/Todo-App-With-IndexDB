@@ -12,10 +12,13 @@ const Login = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [message, setMessage] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 
 	// submit handler
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
+		setIsLoading(true);
+
 		try {
 			await login(email, password);
 			setMessage('User Login Successful');
@@ -32,6 +35,8 @@ const Login = () => {
 			console.error(error);
 			setMessage((error as Error).message || 'Failed to register user.!');
 			setTimeout(() => setMessage(''), 2000);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 	return (
@@ -51,7 +56,7 @@ const Login = () => {
 							required
 						/>
 						<Button type='submit' className='w-full'>
-							Login
+							{isLoading ? 'Logging In...' : 'Login'}
 						</Button>
 						{message && <p className='text-sm text-center mt-2'>{message}</p>}
 					</form>
