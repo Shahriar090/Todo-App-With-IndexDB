@@ -7,7 +7,7 @@ const TodoList = () => {
 
 	return (
 		<div className='space-y-2 h-[550px] overflow-y-scroll custom-scrollbar'>
-			{todos.map((todo) => (
+			{todos?.map((todo) => (
 				<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
 					<div className='flex items-center gap-3'>
 						<Checkbox />
