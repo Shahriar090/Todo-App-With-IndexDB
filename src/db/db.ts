@@ -33,7 +33,7 @@ const db = new Dexie('TodoDatabase') as Dexie & {
 // schema declaration
 db.version(1).stores({
 	users: '++id, email, password, createdAt',
-	todos: '++id, task, status, deadline, createdAt',
+	todos: '++id, userId, task, status, deadline, createdAt',
 	session: '++sessionId, userId',
 });
 

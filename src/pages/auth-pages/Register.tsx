@@ -20,7 +20,6 @@ const Register = () => {
 	try {
 		await register(email, password)
 		setMessage('User Registration Successful')
-		navigate('/login')
 	
 		setEmail('')
 		setPassword('')

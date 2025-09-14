@@ -1,3 +1,5 @@
+import Todo from '@/components/todo-container/Todo';
+import PrivateLayout from '@/Layouts/PrivateLayout';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Login from '@/pages/auth-pages/Login';
 import Register from '@/pages/auth-pages/Register';
@@ -23,7 +25,14 @@ const routes: RouteObject[] = [
 		],
 	},
 	{
-		path: '/',
+		path: '/todo',
+		element: <PrivateLayout />,
+		children: [
+			{
+				index: true,
+				element: <Todo />,
+			},
+		],
 	},
 ];
 

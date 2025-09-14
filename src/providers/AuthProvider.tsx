@@ -1,6 +1,7 @@
 import { AuthContext } from '@/context';
 import { db, type USER } from '@/db/db';
 import { hashPassword } from '@/utils/hashPassword';
+import { normalizeEmail } from '@/utils/normalizeEmail';
 import { useLiveQuery } from 'dexie-react-hooks';
 import type React from 'react';
 
@@ -14,7 +15,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	// Register user logic
 	const registerUser = async (email: string, password: string): Promise<USER> => {
-		const isUserExist = await db.users.where('email').equals(email).first();
+		const normalizedEmail = normalizeEmail(email);
+		const trimmedPassword = password.trim()
+		
+		const isUserExist = await db.users.where('email').equals(normalizedEmail).first();
 
 		if (isUserExist) {
 			throw new Error('User Already Exist.!');
@@ -22,13 +26,18 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		const userInfo = {
 			email,
-			password: hashPassword(password),
+			password: hashPassword(trimmedPassword),
 			createdAt: new Date().toISOString(),
 		};
 
-		const newUser = await db.users.add(userInfo);
+		// after add, it will return an id
+		const newUserId = await db.users.add(userInfo);
+		console.log(newUserId,'New user from auth provider')
 
-		const newlyCreatedUser = await db.users.get(newUser);
+		// here it will give the entire user object
+		const newlyCreatedUser = await db.users.get(newUserId);
+		console.log(newlyCreatedUser,'New user after created from auth provider')
+
 
 		if (!newlyCreatedUser) {
 			throw new Error('Failed To Create New User');
@@ -43,20 +52,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	// Login user logic
 	const loginUser = async (email: string, password: string): Promise<USER> => {
-		const existingUser = await db.users.where('email').equals(email).first();
+		const normalizedEmail = normalizeEmail(email);
+		const trimmedPassword = password.trim()
 
+		const userArray = await db.users.where('email').equals(normalizedEmail).toArray();
+		const existingUser = userArray[0]
+		
+		console.log(existingUser,'Existing user from provider')
 		if (!existingUser) {
 			throw new Error('No User Found.!');
 		}
 
-		if (existingUser.password !== hashPassword(password)) {
+		if (existingUser.password !== hashPassword(trimmedPassword)) {
 			throw new Error('Invalid Password.!');
 		}
 
 		// create session
 		await db.session.clear();
 		await db.session.add({ userId: existingUser.id });
-
 		return existingUser;
 	};
 
