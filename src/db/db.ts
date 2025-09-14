@@ -2,7 +2,7 @@ import Dexie, { type EntityTable } from 'dexie';
 
 // user interface
 interface USER {
-	id: number;
+	id?: number;
 	email: string;
 	password: string;
 	createdAt: string;
@@ -10,7 +10,7 @@ interface USER {
 
 // todo interface
 interface TODO {
-	id: number;
+	id?: number;
 	userId: number;
 	task: string;
 	status: 'pending' | 'completed';
@@ -20,8 +20,8 @@ interface TODO {
 
 // session interface
 interface SESSION {
-	sessionId: number;
-	userId: number;
+	sessionId?: number;
+	userId?: number;
 }
 
 const db = new Dexie('TodoDatabase') as Dexie & {
@@ -39,3 +39,4 @@ db.version(1).stores({
 
 export { db };
 export type { SESSION, TODO, USER };
+
