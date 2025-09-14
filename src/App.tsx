@@ -1,11 +1,8 @@
-import Todo from './components/todo-container/Todo';
+import { RouterProvider } from 'react-router';
+import router from './routes/Routes';
 
 const App = () => {
-	return (
-		<div>
-			<Todo />
-		</div>
-	);
+	return <RouterProvider router={router} />;
 };
 
 export default App;
