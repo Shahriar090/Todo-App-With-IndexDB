@@ -13,6 +13,10 @@ const routes: RouteObject[] = [
 				element: <Register />,
 			},
 			{
+				path: '/register',
+				element: <Register />,
+			},
+			{
 				path: 'login',
 				element: <Login />,
 			},
