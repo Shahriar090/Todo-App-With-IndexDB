@@ -33,19 +33,46 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		}
 		await db.todos.add({ ...payload, userId: user.id });
 
+		// No need to manually update state, useLiveQuery handles it
+
 		// setTodos(await db.todos.toArray());
 	};
 
 	// update a todo
 	const updateTodo = async (id: number, payload: Partial<TODO>) => {
+		if (!user?.id) {
+			throw new Error('User must be authenticated to update todos');
+		}
+
+		// find existing todos
+		const existingTodos = await db.todos.get(id);
+
+		if (!existingTodos || existingTodos.userId !== user.id) {
+			throw new Error('You are unauthorized to get these todos.!');
+		}
 		await db.todos.update(id, payload);
-		setTodos(await db.todos.toArray());
+
+		// No need to manually update state, useLiveQuery handles it
+
+		// setTodos(await db.todos.toArray());
 	};
 
 	// delete a todo
 	const deleteTodo = async (id: number) => {
+		if (!user?.id) {
+			throw new Error('User must be authenticated to delete todos');
+		}
+
+		const existingTodos = await db.todos.get(id);
+
+		if (!existingTodos || existingTodos.userId !== user.id) {
+			throw new Error('You are not allowd to delete this todo.!');
+		}
 		await db.todos.delete(id);
-		setTodos(await db.todos.toArray());
+
+		// No need to manually update state, useLiveQuery handles it
+
+		// setTodos(await db.todos.toArray());
 	};
 
 	const value = {
