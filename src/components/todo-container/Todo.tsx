@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import UserProfile from '../user-profile/UserProfile';
 import AddTodo from './AddTodo';
 import FilterTodo from './FilterTodo';
 import Search from './Search';
@@ -17,6 +18,8 @@ const Todo = () => {
 					<div className='flex items-center gap-4 text-zinc-200'>
 						<Search />
 						<FilterTodo />
+						{/* user profile section */}
+						<UserProfile/>
 					</div>
 				</div>
 

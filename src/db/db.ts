@@ -11,7 +11,7 @@ interface USER {
 // todo interface
 interface TODO {
 	id?: number;
-	userId: number;
+	userId?: number;
 	task: string;
 	status: 'pending' | 'completed';
 	deadline: string;

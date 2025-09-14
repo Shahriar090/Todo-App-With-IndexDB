@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
+/** biome-ignore-all lint/correctness/useUniqueElementIds: unique id related rules were removed */
 import { useTodo } from '@/hooks/useTodo';
 import type React from 'react';
 import { useState } from 'react';
