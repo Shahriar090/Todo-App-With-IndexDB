@@ -2,6 +2,7 @@ import { AuthContext } from '@/context';
 import { db, type USER } from '@/db/db';
 import { hashPassword } from '@/utils/hashPassword';
 import { normalizeEmail } from '@/utils/normalizeEmail';
+import { SESSION_DURATION } from '@/utils/sessionDuration';
 import { useLiveQuery } from 'dexie-react-hooks';
 import type React from 'react';
 
@@ -10,6 +11,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const user = useLiveQuery(async () => {
 		const session = await db.session.toCollection().first();
 		if (!session) return null;
+
+		// check session expiry
+		if (session.expiresAt && Date.now() > session.expiresAt) {
+			await db.session.clear();
+			return null;
+		}
 		return await db.users.get(session.userId);
 	}, []);
 
@@ -47,7 +54,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// create session
 		await db.session.clear();
-		await db.session.add({ userId: newlyCreatedUser.id });
+		await db.session.add({
+			userId: newlyCreatedUser.id,
+			createdAt: Date.now(),
+			expiresAt: Date.now() + SESSION_DURATION,
+		});
 
 		return newlyCreatedUser;
 	};
@@ -71,7 +82,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// create session
 		await db.session.clear();
-		await db.session.add({ userId: existingUser.id });
+		await db.session.add({ userId: existingUser.id, createdAt: Date.now(), expiresAt: Date.now() + SESSION_DURATION });
 		return existingUser;
 	};
 
@@ -85,6 +96,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		const session = await db.session.toCollection().first();
 
 		if (!session) return null;
+
+		// check session expiry
+		if (session.expiresAt && Date.now() > session.expiresAt) {
+			await db.session.clear();
+			return null;
+		}
 
 		const user = await db.users.get(session.userId);
 
