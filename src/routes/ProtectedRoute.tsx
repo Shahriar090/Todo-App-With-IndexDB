@@ -3,10 +3,12 @@ import type React from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-	const { user } = useAuth();
+
+	const {user, loading} = useAuth()
+
 	const location = useLocation();
 
-	if (user === undefined) {
+	if (loading) {
 		return (
 			<div className='w-full h-screen flex items-center justify-center bg-zinc-900'>
 				<div className='text-white'>Loading...</div>

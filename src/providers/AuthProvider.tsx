@@ -13,11 +13,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		return await db.users.get(session.userId);
 	}, []);
 
+	// handling loading state to fix protected route instantly redirecting user to login page if user relodes the window, while user is undefined
+	const loading = user === undefined;
+
 	// Register user logic
 	const registerUser = async (email: string, password: string): Promise<USER> => {
 		const normalizedEmail = normalizeEmail(email);
-		const trimmedPassword = password.trim()
-		
+		const trimmedPassword = password.trim();
+
 		const isUserExist = await db.users.where('email').equals(normalizedEmail).first();
 
 		if (isUserExist) {
@@ -32,12 +35,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// after add, it will return an id
 		const newUserId = await db.users.add(userInfo);
-		console.log(newUserId,'New user from auth provider')
+		console.log(newUserId, 'New user from auth provider');
 
 		// here it will give the entire user object
 		const newlyCreatedUser = await db.users.get(newUserId);
-		console.log(newlyCreatedUser,'New user after created from auth provider')
-
+		console.log(newlyCreatedUser, 'New user after created from auth provider');
 
 		if (!newlyCreatedUser) {
 			throw new Error('Failed To Create New User');
@@ -53,12 +55,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	// Login user logic
 	const loginUser = async (email: string, password: string): Promise<USER> => {
 		const normalizedEmail = normalizeEmail(email);
-		const trimmedPassword = password.trim()
+		const trimmedPassword = password.trim();
 
 		const userArray = await db.users.where('email').equals(normalizedEmail).toArray();
-		const existingUser = userArray[0]
-		
-		console.log(existingUser,'Existing user from provider')
+		const existingUser = userArray[0];
+
+		console.log(existingUser, 'Existing user from provider');
 		if (!existingUser) {
 			throw new Error('No User Found.!');
 		}
@@ -91,6 +93,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const value = {
 		user: user ?? null,
+		loading,
 		login: loginUser,
 		register: registerUser,
 		logout: logoutUser,

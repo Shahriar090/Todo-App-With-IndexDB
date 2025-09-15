@@ -19,7 +19,7 @@ const Todo = () => {
 						<Search />
 						<FilterTodo />
 						{/* user profile section */}
-						<UserProfile/>
+						<UserProfile />
 					</div>
 				</div>
 

@@ -57,6 +57,23 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		// setTodos(await db.todos.toArray());
 	};
 
+	// change todo status
+	const changeTodoStatus = async (id: number) => {
+		if (!user?.id) {
+			throw new Error('User must be authenticated to update todos');
+		}
+		// find existing todos
+		const todoToUpdate = await db.todos.get(id);
+
+		if (!todoToUpdate || todoToUpdate.userId !== user.id) {
+			throw new Error('You are unauthorized to get these todos.!');
+		}
+
+		const newStatus = todoToUpdate.status === 'pending' ? 'completed' : 'pending';
+
+		await db.todos.update(id, { status: newStatus });
+	};
+
 	// delete a todo
 	const deleteTodo = async (id: number) => {
 		if (!user?.id) {
@@ -79,6 +96,7 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		todos,
 		addTodo,
 		updateTodo,
+		changeTodoStatus,
 		deleteTodo,
 	};
 
