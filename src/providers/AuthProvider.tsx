@@ -14,7 +14,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// check session expiry
 		if (session.expiresAt && Date.now() > session.expiresAt) {
-			await db.session.clear();
+			// TODO => clearing seassion here was causing a major bug. fix it later.
+			// await db.session.clear();
+
 			return null;
 		}
 		return await db.users.get(session.userId);

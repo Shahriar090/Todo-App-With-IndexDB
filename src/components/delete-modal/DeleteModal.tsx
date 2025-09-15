@@ -13,7 +13,7 @@ import {
 const DeleteModal = ({ open, onClose, onConfirm, itemName }: DeleteModalProps) => {
 	return (
 		<AlertDialog open={open} onOpenChange={onClose}>
-			<AlertDialogContent>
+			<AlertDialogContent className='bg-zinc-900 border-zinc-700 text-zinc-200 w-full max-w-xl'>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Are you sure you want to delete this todo?</AlertDialogTitle>
 					<AlertDialogDescription>
@@ -28,7 +28,7 @@ const DeleteModal = ({ open, onClose, onConfirm, itemName }: DeleteModalProps) =
 				</AlertDialogHeader>
 
 				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogCancel className='text-black'>Cancel</AlertDialogCancel>
 					<AlertDialogAction onClick={onConfirm}>Yes, Delete</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

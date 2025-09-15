@@ -25,6 +25,15 @@ export type AuthContextType = {
 
 // **********************************************************************************************
 
+// ************************************* EDIT MODAL PROPS ********************************************//
+export type EditModalProps = {
+	open: boolean;
+	onClose: () => void;
+	todo: TODO | null;
+	onConfirm: (updatedTodo: { task: string; deadline: string }) => void;
+};
+// ***************************************************************************************************//
+
 // ********************************** DELETE MODAL PROPS ***********************************************//
 
 export type DeleteModalProps = {

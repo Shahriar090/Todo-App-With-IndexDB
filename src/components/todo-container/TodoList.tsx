@@ -2,17 +2,45 @@ import { db, type TODO } from '@/db/db';
 import { useTodo } from '@/hooks/useTodo';
 import { useState } from 'react';
 import DeleteModal from '../delete-modal/DeleteModal';
+import EditModal from '../edit-modal/EditModal';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { ScrollArea } from '../ui/scroll-area';
 
 const TodoList = () => {
-	const { todos, changeTodoStatus } = useTodo();
+	const { todos, changeTodoStatus, updateTodo } = useTodo();
 
+	console.log(todos, 'from todo list');
 	// states for delete logic
 	const [selectedTodo, setSelectedTodo] = useState<TODO | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+	// states for update
+	const [editingTodo, setEditingTodo] = useState<TODO | null>(null);
+	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+	// edit todo related logic starts
+	const handleEditClick = (todo: TODO) => {
+		setEditingTodo(todo);
+		setIsEditModalOpen(true);
+	};
+
+	// edit handler
+	const handleEditConfirm = async (updated: { task: string; deadline: string }) => {
+		if (!editingTodo?.id) return null;
+
+		try {
+			await updateTodo(editingTodo?.id, updated);
+			setIsEditModalOpen(false);
+			setEditingTodo(null);
+		} catch (error: unknown) {
+			console.error(error);
+		}
+	};
+
+	// edit todo related logc end
+
+	// delete todo related logic start
 	// handle delete click handler
 	const handleDeleteClick = (todo: TODO) => {
 		setSelectedTodo(todo);
@@ -27,6 +55,8 @@ const TodoList = () => {
 		setIsModalOpen(false);
 		setSelectedTodo(null);
 	};
+
+	// delete todo related logic end
 
 	// toggle todo status handler
 	const handleTodoToggle = async (id: number) => {
@@ -53,7 +83,7 @@ const TodoList = () => {
 									{todo.task}
 								</p>
 								<p className='text-sm text-zinc-400'>
-									Created On: {new Date(todo.createdAt).toISOString().split('T')[0]}
+									Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
 								</p>
 								<p className='text-sm text-zinc-400'>Deadline: {todo.deadline}</p>
 								<p className={`${todo.status === 'pending' ? 'text-xs text-amber-400' : 'text-xs text-green-400'}`}>
@@ -62,7 +92,11 @@ const TodoList = () => {
 							</div>
 						</div>
 						<div className='flex items-center gap-2'>
-							<Button size='sm' variant='default' className='text-zinc-200 bg-zinc-800'>
+							<Button
+								onClick={() => handleEditClick(todo)}
+								size='sm'
+								variant='default'
+								className='text-zinc-200 bg-zinc-800'>
 								Edit
 							</Button>
 							<Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
@@ -72,12 +106,28 @@ const TodoList = () => {
 					</div>
 				))}
 
-				<DeleteModal
-					open={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
-					onConfirm={handleDeleteConfirm}
-					itemName={selectedTodo?.task as string}
-				/>
+				{/* delete modal */}
+				{isModalOpen && selectedTodo && (
+					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+						<DeleteModal
+							open={isModalOpen}
+							onClose={() => setIsModalOpen(false)}
+							onConfirm={handleDeleteConfirm}
+							itemName={selectedTodo?.task as string}
+						/>
+					</div>
+				)}
+				{/* edit modal */}
+				{isEditModalOpen && editingTodo && (
+					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+						<EditModal
+							open={isEditModalOpen}
+							onClose={() => setIsEditModalOpen(false)}
+							todo={editingTodo}
+							onConfirm={handleEditConfirm}
+						/>
+					</div>
+				)}
 			</div>
 		</ScrollArea>
 	);

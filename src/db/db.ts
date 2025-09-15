@@ -12,10 +12,12 @@ interface USER {
 interface TODO {
 	id?: number;
 	userId?: number;
-	task: string;
-	status: 'pending' | 'completed';
-	deadline: string;
-	createdAt: string;
+	encryptedData: string;
+
+	// task: string;
+	// status: 'pending' | 'completed';
+	// deadline: string;
+	// createdAt?: string;
 }
 
 // session interface
@@ -35,7 +37,9 @@ const db = new Dexie('TodoDatabase') as Dexie & {
 // schema declaration
 db.version(1).stores({
 	users: '++id, email, password, createdAt',
-	todos: '++id, userId, task, status, deadline, createdAt',
+	// todos: '++id, userId, task, status, deadline, createdAt',
+	// for full object encryption
+	todos: '++id, userId, encryptedData',
 	session: '++sessionId, userId, expiresAt, createdAt',
 });
 

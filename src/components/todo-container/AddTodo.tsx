@@ -38,13 +38,13 @@ const AddTodo = () => {
 	};
 
 	return (
-		<Card className='bg-zinc-900 border-zinc-700 text-zinc-200'>
+		<Card className='bg-zinc-900 border-zinc-700 text-zinc-200 '>
 			<CardHeader>
 				<CardTitle>Add New Todo</CardTitle>
 			</CardHeader>
 			<CardContent className='space-y-4'>
-				<form onSubmit={handleSubmit} className='space-y-3'>
-					<div>
+				<form onSubmit={handleSubmit} className='space-y-8'>
+					<div className='space-y-1'>
 						<Label htmlFor='task' className='text-sm'>
 							Task
 						</Label>
@@ -53,16 +53,16 @@ const AddTodo = () => {
 							value={task}
 							onChange={(e) => setTask(e.target.value)}
 							placeholder='Enter your task'
-							className='bg-zinc-800 border-zinc-700'
+							className='bg-zinc-800 border-zinc-700 py-5'
 						/>
 					</div>
 
-					<div className='space-y-3'>
+					<div className='space-y-1'>
 						<Label htmlFor='status' className='text-sm'>
 							Status
 						</Label>
 						<Select value={status} onValueChange={(value) => setStatus(value as 'pending' | 'completed')}>
-							<SelectTrigger className='bg-zinc-800 border-zinc-700'>
+							<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
 								<SelectValue placeholder='Select status' />
 							</SelectTrigger>
 							<SelectContent>
@@ -72,7 +72,7 @@ const AddTodo = () => {
 						</Select>
 					</div>
 
-					<div className='space-y-2'>
+					<div className='space-y-1'>
 						<Label htmlFor='deadline' className='text-sm'>
 							Deadline
 						</Label>
@@ -81,11 +81,11 @@ const AddTodo = () => {
 							id='deadline'
 							value={deadline}
 							onChange={(e) => setDeadline(e.target.value)}
-							className='bg-zinc-800 border-zinc-700'
+							className='bg-zinc-800 border-zinc-700 py-5'
 						/>
 					</div>
 
-					<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer'>
+					<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5'>
 						Add Todo
 					</Button>
 				</form>

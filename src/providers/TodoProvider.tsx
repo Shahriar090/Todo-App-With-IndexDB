@@ -31,11 +31,16 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		const encryptedTodos = await db.todos.where('userId').equals(user.id).toArray();
 
 		// dcrypt each todo
-		const dcryptedTodo = encryptedTodos.map((todo) => ({
-			...todo,
-			task: decryptString(todo.task, user.email),
-		}));
-		return dcryptedTodo;
+		// const dcryptedTodo = encryptedTodos.map((todo) => ({
+		// 	...todo,
+		// 	task: decryptString(todo.task, user.email),
+		// }));
+		const dcryptedTodos = encryptedTodos.map((todo) => {
+			const decrypted = JSON.parse(decryptString(todo.encryptedData, user.email));
+			return { ...decrypted, id: todo.id };
+		});
+		// console.log(dcryptedTodo);
+		return dcryptedTodos;
 	}, [user?.id]);
 
 	// add new todo
@@ -44,10 +49,33 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			throw new Error('User must be authenticated to add todos');
 		}
 
-		// encrypt data before saving into db
-		const encryptedTask = encryptString(payload.task, user.email);
+		// encrypting full object
+		const encryptedData = encryptString(
+			JSON.stringify({
+				...payload,
+				userId: user.id,
+				createedAt: new Date().toISOString(),
+			}),
+			user.email,
+		);
 
-		await db.todos.add({ ...payload, task: encryptedTask, userId: user.id });
+		await db.todos.add({
+			userId: user.id,
+			encryptedData,
+		});
+
+		// encrypt data before saving into db
+		// const encryptedTask = encryptString(payload.task, user.email);
+		// const encryptedData = {
+		// 	task: encryptString(payload.task, user?.email),
+		// 	status: payload.status,
+		// 	deadline: encryptString(payload.deadline, user.email),
+		// 	userId: user.id,
+		// 	createdAt: new Date().toISOString(),
+		// };
+		// await db.todos.add(encryptedData);
+
+		// await db.todos.add({ ...payload, task: encryptedTask, userId: user.id });
 
 		// No need to manually update state, useLiveQuery handles it
 
@@ -67,12 +95,19 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			throw new Error('You are unauthorized to get these todos.!');
 		}
 
-		// encrypt task before save
-		const updatedPayload = {
+		// decrypt existing data
+		const decryptedData = JSON.parse(decryptString(existingTodos.encryptedData, user.email));
+
+		// merge with new payload
+		const updated = {
+			...decryptedData,
 			...payload,
-			task: payload.task ? encryptString(payload.task, user.email) : undefined,
 		};
-		await db.todos.update(id, updatedPayload);
+
+		// reencrypt before save into db
+		const reencrypt = encryptString(JSON.stringify(updated), user.email);
+
+		await db.todos.update(id, { encryptedData: reencrypt });
 
 		// No need to manually update state, useLiveQuery handles it
 
@@ -91,9 +126,15 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			throw new Error('You are unauthorized to get these todos.!');
 		}
 
-		const newStatus = todoToUpdate.status === 'pending' ? 'completed' : 'pending';
+		// decrypt full object
+		const decrypted = JSON.parse(decryptString(todoToUpdate.encryptedData, user.email));
 
-		await db.todos.update(id, { status: newStatus });
+		const newStatus = decrypted.status === 'pending' ? 'completed' : 'pending';
+		const updated = { ...decrypted, status: newStatus };
+
+		// encrypt again
+		const reencrypt = encryptString(JSON.stringify(updated), user.email);
+		await db.todos.update(id, { encryptedData: reencrypt });
 	};
 
 	// delete a todo
