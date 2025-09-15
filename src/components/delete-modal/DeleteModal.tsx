@@ -1,6 +1,8 @@
+import type { DeleteModalProps } from "@/types/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 
-const DeleteModal = ({ open, onClose, onConfirm, itemName }) => {
+
+const DeleteModal = ({ open, onClose, onConfirm, itemName }:DeleteModalProps) => {
 	return <AlertDialog open={open} onOpenChange={onClose}>
     <AlertDialogContent>
       <AlertDialogHeader>

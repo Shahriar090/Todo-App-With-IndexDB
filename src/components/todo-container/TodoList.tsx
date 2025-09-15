@@ -76,7 +76,7 @@ const TodoList = () => {
 					open={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
 					onConfirm={handleDeleteConfirm}
-					itemName={selectedTodo?.task}
+					itemName={selectedTodo?.task as string}
 				/>
 			</div>
 		</ScrollArea>
