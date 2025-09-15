@@ -1,6 +1,8 @@
 import { TodoContext } from '@/context';
 import { db, type TODO } from '@/db/db';
 import { useAuth } from '@/hooks/useAuth';
+import { decryptString } from '@/utils/dcryptString';
+import { encryptString } from '@/utils/encryptString';
 import { useLiveQuery } from 'dexie-react-hooks';
 import type React from 'react';
 
@@ -22,8 +24,18 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 	const todos = useLiveQuery(async () => {
 		if (!user?.id) return [];
 
-		// only fetch todos for current authenticated user
-		return await db.todos.where('userId').equals(user.id).toArray();
+		// only fetch todos for current authenticated user (before enc/dcp logic)
+		// return await db.todos.where('userId').equals(user.id).toArray();
+
+		// after enc/dcp logic
+		const encryptedTodos = await db.todos.where('userId').equals(user.id).toArray();
+
+		// dcrypt each todo
+		const dcryptedTodo = encryptedTodos.map((todo) => ({
+			...todo,
+			task: decryptString(todo.task, user.email),
+		}));
+		return dcryptedTodo;
 	}, [user?.id]);
 
 	// add new todo
@@ -31,7 +43,11 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		if (!user?.id) {
 			throw new Error('User must be authenticated to add todos');
 		}
-		await db.todos.add({ ...payload, userId: user.id });
+
+		// encrypt data before saving into db
+		const encryptedTask = encryptString(payload.task, user.email);
+
+		await db.todos.add({ ...payload, task: encryptedTask, userId: user.id });
 
 		// No need to manually update state, useLiveQuery handles it
 
@@ -50,7 +66,13 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		if (!existingTodos || existingTodos.userId !== user.id) {
 			throw new Error('You are unauthorized to get these todos.!');
 		}
-		await db.todos.update(id, payload);
+
+		// encrypt task before save
+		const updatedPayload = {
+			...payload,
+			task: payload.task ? encryptString(payload.task, user.email) : undefined,
+		};
+		await db.todos.update(id, updatedPayload);
 
 		// No need to manually update state, useLiveQuery handles it
 
