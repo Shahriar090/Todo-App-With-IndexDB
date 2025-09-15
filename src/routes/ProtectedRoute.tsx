@@ -3,8 +3,7 @@ import type React from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-
-	const {user, loading} = useAuth()
+	const { user, loading } = useAuth();
 
 	const location = useLocation();
 

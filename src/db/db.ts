@@ -22,6 +22,8 @@ interface TODO {
 interface SESSION {
 	sessionId?: number;
 	userId?: number;
+	expiresAt?: number;
+	createdAt?: number;
 }
 
 const db = new Dexie('TodoDatabase') as Dexie & {
@@ -34,7 +36,7 @@ const db = new Dexie('TodoDatabase') as Dexie & {
 db.version(1).stores({
 	users: '++id, email, password, createdAt',
 	todos: '++id, userId, task, status, deadline, createdAt',
-	session: '++sessionId, userId',
+	session: '++sessionId, userId, expiresAt, createdAt',
 });
 
 export { db };
