@@ -1,10 +1,32 @@
+import { db, type TODO } from '@/db/db';
 import { useTodo } from '@/hooks/useTodo';
+import { useState } from 'react';
+import DeleteModal from '../delete-modal/DeleteModal';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { ScrollArea } from '../ui/scroll-area';
 
 const TodoList = () => {
 	const { todos, changeTodoStatus } = useTodo();
+
+	// states for delete logic
+	const [selectedTodo, setSelectedTodo] = useState<TODO | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+	// handle delete click handler
+	const handleDeleteClick = (todo: TODO) => {
+		setSelectedTodo(todo);
+		setIsModalOpen(true);
+	};
+
+	// confirm delete handler
+	const handleDeleteConfirm = async () => {
+		if (selectedTodo?.id) {
+			await db.todos.delete(selectedTodo.id);
+		}
+		setIsModalOpen(false);
+		setSelectedTodo(null);
+	};
 
 	// toggle todo status handler
 	const handleTodoToggle = async (id: number) => {
@@ -43,12 +65,19 @@ const TodoList = () => {
 							<Button size='sm' variant='default' className='text-zinc-200 bg-zinc-800'>
 								Edit
 							</Button>
-							<Button size='sm' variant='destructive'>
+							<Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
 								Delete
 							</Button>
 						</div>
 					</div>
 				))}
+
+				<DeleteModal
+					open={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					onConfirm={handleDeleteConfirm}
+					itemName={selectedTodo?.task}
+				/>
 			</div>
 		</ScrollArea>
 	);
