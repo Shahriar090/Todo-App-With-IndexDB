@@ -1,6 +1,7 @@
 import { TodoContext } from '@/context';
-import { db, type TODO } from '@/db/db';
+import { db } from '@/db/db';
 import { useAuth } from '@/hooks/useAuth';
+import type { DecryptedTodoType } from '@/types/types';
 import { decryptString } from '@/utils/dcryptString';
 import { encryptString } from '@/utils/encryptString';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -35,7 +36,7 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 		// 	...todo,
 		// 	task: decryptString(todo.task, user.email),
 		// }));
-		const dcryptedTodos = encryptedTodos.map((todo) => {
+		const dcryptedTodos: DecryptedTodoType[] = encryptedTodos.map((todo) => {
 			const decrypted = JSON.parse(decryptString(todo.encryptedData, user.email));
 			return { ...decrypted, id: todo.id };
 		});
@@ -44,7 +45,7 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [user?.id]);
 
 	// add new todo
-	const addTodo = async (payload: Omit<TODO, 'id' | 'userId'>) => {
+	const addTodo = async (payload: { task: string; status: 'pending' | 'completed'; deadline: string }) => {
 		if (!user?.id) {
 			throw new Error('User must be authenticated to add todos');
 		}
@@ -54,11 +55,10 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			JSON.stringify({
 				...payload,
 				userId: user.id,
-				createedAt: new Date().toISOString(),
+				createdAt: new Date().toISOString(),
 			}),
 			user.email,
 		);
-
 		await db.todos.add({
 			userId: user.id,
 			encryptedData,
@@ -83,7 +83,7 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	// update a todo
-	const updateTodo = async (id: number, payload: Partial<TODO>) => {
+	const updateTodo = async (id: number, payload: Partial<DecryptedTodoType>) => {
 		if (!user?.id) {
 			throw new Error('User must be authenticated to update todos');
 		}

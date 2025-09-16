@@ -1,5 +1,6 @@
-import { db, type TODO } from '@/db/db';
+import { db } from '@/db/db';
 import { useTodo } from '@/hooks/useTodo';
+import type { DecryptedTodoType } from '@/types/types';
 import { useState } from 'react';
 import DeleteModal from '../delete-modal/DeleteModal';
 import EditModal from '../edit-modal/EditModal';
@@ -12,15 +13,15 @@ const TodoList = () => {
 
 	console.log(todos, 'from todo list');
 	// states for delete logic
-	const [selectedTodo, setSelectedTodo] = useState<TODO | null>(null);
+	const [selectedTodo, setSelectedTodo] = useState<DecryptedTodoType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	// states for update
-	const [editingTodo, setEditingTodo] = useState<TODO | null>(null);
+	const [editingTodo, setEditingTodo] = useState<DecryptedTodoType | null>(null);
 	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
 	// edit todo related logic starts
-	const handleEditClick = (todo: TODO) => {
+	const handleEditClick = (todo: DecryptedTodoType) => {
 		setEditingTodo(todo);
 		setIsEditModalOpen(true);
 	};
@@ -42,7 +43,7 @@ const TodoList = () => {
 
 	// delete todo related logic start
 	// handle delete click handler
-	const handleDeleteClick = (todo: TODO) => {
+	const handleDeleteClick = (todo: DecryptedTodoType) => {
 		setSelectedTodo(todo);
 		setIsModalOpen(true);
 	};
@@ -70,41 +71,45 @@ const TodoList = () => {
 	return (
 		<ScrollArea className='h-[400px] rounded-md'>
 			<div className='space-y-3'>
-				{todos?.map((todo) => (
-					<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
-						<div className='flex items-center gap-3'>
-							<Checkbox
-								checked={todo.status === 'completed'}
-								onCheckedChange={() => handleTodoToggle(Number(todo.id))}
-							/>
-							<div>
-								<p
-									className={`${todo.status === 'completed' ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-medium'}`}>
-									{todo.task}
-								</p>
-								<p className='text-sm text-zinc-400'>
-									Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
-								</p>
-								<p className='text-sm text-zinc-400'>Deadline: {todo.deadline}</p>
-								<p className={`${todo.status === 'pending' ? 'text-xs text-amber-400' : 'text-xs text-green-400'}`}>
-									Status: {todo.status}
-								</p>
+				{todos?.map((todo) => {
+					console.log(todo);
+
+					return (
+						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
+							<div className='flex items-center gap-3'>
+								<Checkbox
+									checked={todo?.status === 'completed'}
+									onCheckedChange={() => handleTodoToggle(Number(todo.id))}
+								/>
+								<div>
+									<p
+										className={`${todo.status === 'completed' ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-medium'}`}>
+										{todo.task}
+									</p>
+									<p className='text-sm text-zinc-400'>
+										Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
+									</p>
+									<p className='text-sm text-zinc-400'>Deadline: {todo.deadline}</p>
+									<p className={`${todo.status === 'pending' ? 'text-xs text-amber-400' : 'text-xs text-green-400'}`}>
+										Status: {todo.status}
+									</p>
+								</div>
+							</div>
+							<div className='flex items-center gap-2'>
+								<Button
+									onClick={() => handleEditClick(todo)}
+									size='sm'
+									variant='default'
+									className='text-zinc-200 bg-zinc-800'>
+									Edit
+								</Button>
+								<Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
+									Delete
+								</Button>
 							</div>
 						</div>
-						<div className='flex items-center gap-2'>
-							<Button
-								onClick={() => handleEditClick(todo)}
-								size='sm'
-								variant='default'
-								className='text-zinc-200 bg-zinc-800'>
-								Edit
-							</Button>
-							<Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
-								Delete
-							</Button>
-						</div>
-					</div>
-				))}
+					);
+				})}
 
 				{/* delete modal */}
 				{isModalOpen && selectedTodo && (

@@ -28,7 +28,7 @@ const AddTodo = () => {
 			task,
 			status,
 			deadline,
-			createdAt: new Date().toString(),
+			// createdAt: new Date().toString(),
 		});
 
 		// reset the form after submission
