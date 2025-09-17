@@ -2,6 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { registerUserValidationSchema, type RegisterUserFormData } from '@/config/registerUserValidationSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 
 const Register = () => {
@@ -40,6 +44,19 @@ const Register = () => {
 
 	// upgraded version with proper api calling
 
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterUserFormData>({
+		resolver: zodResolver(registerUserValidationSchema),
+	});
+
+	// submit handler react hook form
+	const onSubmit: SubmitHandler<RegisterUserFormData> = (payload: RegisterUserFormData) => {
+		console.log(payload);
+	};
+
 	return (
 		<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
 			<Card className='w-full max-w-lg mx-auto mt-10 shadow-xl rounded-2xl'>
@@ -47,26 +64,31 @@ const Register = () => {
 					<CardTitle className='text-xl'>Register</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form className='space-y-4'>
+					<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
 						{/* first name */}
 						<Label htmlFor='first-name'>First Name</Label>
-						<Input placeholder='Enter Your First Name' type='text' />
+						<Input placeholder='Enter Your First Name' type='text' {...register('firstName', { required: true })} />
+						{errors.firstName && <p className='text-red-600 font-medium text-sm'>{errors.firstName.message}</p>}
 
 						{/* last name */}
 						<Label htmlFor='last-name'>Last Name</Label>
-						<Input placeholder='Enter Your Last Name' type='text' />
+						<Input placeholder='Enter Your Last Name' type='text' {...register('lastName', { required: true })} />
+						{errors.lastName && <p className='text-red-600 font-medium text-sm'>{errors.lastName.message}</p>}
 
 						{/* user name */}
 						<Label htmlFor='user-name'>User Name</Label>
-						<Input placeholder='Enter User Name (username)' type='text' />
+						<Input placeholder='Enter User Name (ironman)' type='text' {...register('username', { required: true })} />
+						{errors.username && <p className='text-red-600 font-medium text-sm'>{errors.username.message}</p>}
 
 						{/* email */}
 						<Label htmlFor='email'>Email</Label>
-						<Input placeholder='Enter Your Email' type='email' required />
+						<Input placeholder='Enter Your Email' type='email' {...register('email', { required: true })} />
+						{errors.email && <p className='text-red-600 font-medium text-sm'>{errors.email.message}</p>}
 
 						{/* password */}
 						<Label htmlFor='password'>Password</Label>
-						<Input placeholder='Enter Your Password' type='password' required />
+						<Input placeholder='Enter Your Password' type='password' {...register('password', { required: true })} />
+						{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>}
 
 						{/* submit button */}
 						<Button type='submit' className='w-full'>
