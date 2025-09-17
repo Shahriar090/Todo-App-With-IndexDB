@@ -56,3 +56,76 @@ export type DecryptedTodoType = {
 	createdAt: string;
 };
 // ******************************************************************************************************//
+
+// ****************************************** API RELATED TYPES ******************************************//
+
+// **************************************** USER TYPE ******************************************//
+
+export type UserType = {
+	id: string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatarUrl: string;
+	createdAt: string;
+	updatedAt: string;
+};
+
+// *********************************** TODO TYPE *********************************************//
+export const Priority = {
+	Low: 'low',
+	Medium: 'medium',
+	High: 'high',
+} as const;
+
+export type PriorityType = (typeof Priority)[keyof typeof Priority];
+
+export type TodoType = {
+	id: string;
+	title: string;
+	description: string;
+	completed: boolean;
+	priority: PriorityType;
+	category: string;
+	dueDate: string;
+	userId: string;
+	sharedListId: string;
+	createdAt: string;
+	updatedAt: string;
+	version: number;
+	sharedListName: string;
+};
+
+// ****************************** SHARED LIST TYPE ************************************************//4
+export type SharedList = {
+	id: string;
+	name: string;
+	description: string;
+	ownerId: string;
+	createdAt: string;
+	updatedAt: string;
+	role: string;
+	status: string;
+	ownerName: string;
+};
+
+// ************************************* CATEGORY TYPE *******************************************//
+export type CategoryType = {
+	id: string;
+	name: string;
+	color: string;
+	userId: string;
+	createdAt: string;
+};
+
+// ************************************************* AUTH RESPONSE TYPE *********************************//
+export type AuthResponseType = {
+	token: string;
+	user: UserType;
+};
+
+// **************************************** ERROR TYPE *******************************************//
+export type ErrorType = {
+	error: string;
+};
