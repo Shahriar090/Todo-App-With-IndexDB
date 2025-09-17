@@ -6,10 +6,11 @@ import {
 	registerUserValidationSchema,
 	type RegisterUserFormDataType,
 } from '@/config/auth/registerUserValidationSchema';
+import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 const Register = () => {
 	// const { register } = useAuth();
@@ -55,9 +56,21 @@ const Register = () => {
 		resolver: zodResolver(registerUserValidationSchema),
 	});
 
+	// using mutation logic from rtk query
+	const [registerUser, { isLoading, isError }] = useRegisterUserMutation();
+	const navigate = useNavigate();
+
 	// submit handler react hook form
 	const onSubmit: SubmitHandler<RegisterUserFormDataType> = async (payload: RegisterUserFormDataType) => {
-		console.log(payload);
+		try {
+			await registerUser(payload).unwrap();
+
+			// TODO => add toast
+			navigate('/login');
+		} catch (error: unknown) {
+			console.error('Registration Failed', error);
+			// TODO => add toast
+		}
 	};
 
 	return (
@@ -95,9 +108,11 @@ const Register = () => {
 
 						{/* submit button */}
 						<Button type='submit' className='w-full'>
-							Register
+							{isLoading ? 'Registering...' : 'Register'}
 						</Button>
 					</form>
+					{/* handling error */}
+					{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to register..!</p>}
 
 					<div className='pt-5'>
 						<p className='text-xs'>
