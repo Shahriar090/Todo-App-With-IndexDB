@@ -1,44 +1,44 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
-import type React from 'react';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Label } from '@/components/ui/label';
+import { Link } from 'react-router';
 
 const Register = () => {
-	const { register } = useAuth();
-	const navigate = useNavigate();
+	// const { register } = useAuth();
+	// const navigate = useNavigate();
 
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [message, setMessage] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
+	// const [email, setEmail] = useState('');
+	// const [password, setPassword] = useState('');
+	// const [message, setMessage] = useState('');
+	// const [isLoading, setIsLoading] = useState(false);
 
 	// submit handler
-	const handleSubmit = async (event: React.FormEvent) => {
-		event.preventDefault();
-		setIsLoading(true);
-		try {
-			await register(email, password);
-			setMessage('User Registration Successful');
+	// const handleSubmit = async (event: React.FormEvent) => {
+	// 	event.preventDefault();
+	// 	setIsLoading(true);
+	// 	try {
+	// 		await register(email, password);
+	// 		setMessage('User Registration Successful');
 
-			setEmail('');
-			setPassword('');
+	// 		setEmail('');
+	// 		setPassword('');
 
-			// clear message after 2 seconds and navigate user to login page
-			setTimeout(() => {
-				navigate('/login');
-				setMessage('');
-			}, 2000);
-		} catch (error: unknown) {
-			console.error(error);
-			setMessage((error as Error).message || 'Failed to register user.!');
-			setTimeout(() => setMessage(''), 2000);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	// 		// clear message after 2 seconds and navigate user to login page
+	// 		setTimeout(() => {
+	// 			navigate('/login');
+	// 			setMessage('');
+	// 		}, 2000);
+	// 	} catch (error: unknown) {
+	// 		console.error(error);
+	// 		setMessage((error as Error).message || 'Failed to register user.!');
+	// 		setTimeout(() => setMessage(''), 2000);
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
+
+	// upgraded version with proper api calling
 
 	return (
 		<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
@@ -47,20 +47,31 @@ const Register = () => {
 					<CardTitle className='text-xl'>Register</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className='space-y-4'>
-						<Input placeholder='Email' type='email' required value={email} onChange={(e) => setEmail(e.target.value)} />
-						<Input
-							placeholder='Password'
-							type='password'
-							required
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-						/>
-						<Button type='submit' className='w-full'>
-							{isLoading ? 'Registering...' : '	Register'}
-						</Button>
+					<form className='space-y-4'>
+						{/* first name */}
+						<Label htmlFor='first-name'>First Name</Label>
+						<Input placeholder='Enter Your First Name' type='text' />
 
-						{message && <p className='text-sm text-center mt-2'>{message}</p>}
+						{/* last name */}
+						<Label htmlFor='last-name'>Last Name</Label>
+						<Input placeholder='Enter Your Last Name' type='text' />
+
+						{/* user name */}
+						<Label htmlFor='user-name'>User Name</Label>
+						<Input placeholder='Enter User Name (username)' type='text' />
+
+						{/* email */}
+						<Label htmlFor='email'>Email</Label>
+						<Input placeholder='Enter Your Email' type='email' required />
+
+						{/* password */}
+						<Label htmlFor='password'>Password</Label>
+						<Input placeholder='Enter Your Password' type='password' required />
+
+						{/* submit button */}
+						<Button type='submit' className='w-full'>
+							Register
+						</Button>
 					</form>
 
 					<div className='pt-5'>
