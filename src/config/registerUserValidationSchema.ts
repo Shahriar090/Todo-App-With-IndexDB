@@ -12,4 +12,4 @@ export const registerUserValidationSchema = z.object({
 });
 
 // inferring type
-export type RegisterUserFormData = z.infer<typeof registerUserValidationSchema>;
+export type RegisterUserFormDataType = z.infer<typeof registerUserValidationSchema>;

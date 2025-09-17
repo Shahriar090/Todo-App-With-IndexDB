@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { registerUserValidationSchema, type RegisterUserFormData } from '@/config/registerUserValidationSchema';
+import { registerUserValidationSchema, type RegisterUserFormDataType } from '@/config/registerUserValidationSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -48,12 +48,12 @@ const Register = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<RegisterUserFormData>({
+	} = useForm<RegisterUserFormDataType>({
 		resolver: zodResolver(registerUserValidationSchema),
 	});
 
 	// submit handler react hook form
-	const onSubmit: SubmitHandler<RegisterUserFormData> = (payload: RegisterUserFormData) => {
+	const onSubmit: SubmitHandler<RegisterUserFormDataType> = (payload: RegisterUserFormDataType) => {
 		console.log(payload);
 	};
 
