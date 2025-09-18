@@ -4,7 +4,6 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import Login from '@/pages/auth-pages/Login';
 import Register from '@/pages/auth-pages/Register';
 import { createBrowserRouter, type RouteObject } from 'react-router';
-import ProtectedRoute from './ProtectedRoute';
 
 const routes: RouteObject[] = [
 	{
@@ -27,11 +26,7 @@ const routes: RouteObject[] = [
 	},
 	{
 		path: '/todo',
-		element: (
-			<ProtectedRoute>
-				<PrivateLayout />
-			</ProtectedRoute>
-		),
+		element: <PrivateLayout />,
 		children: [
 			{
 				index: true,

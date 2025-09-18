@@ -6,7 +6,9 @@ import {
 	registerUserValidationSchema,
 	type RegisterUserFormDataType,
 } from '@/config/auth/registerUserValidationSchema';
+import { setCredentials } from '@/redux/features/auth/auth-slice/authSlice';
 import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
+import { useAppDispatch } from '@/redux/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -60,12 +62,14 @@ const Register = () => {
 	// using mutation logic from rtk query
 	const [registerUser, { isLoading, isError }] = useRegisterUserMutation();
 	// const navigate = useNavigate();
+	const dispatch = useAppDispatch()
 
 	// submit handler react hook form
 	const onSubmit: SubmitHandler<RegisterUserFormDataType> = async (payload: RegisterUserFormDataType) => {
 		try {
 		const res =	await registerUser(payload).unwrap();
 		toast.success(res.message, {duration:2000})
+		dispatch(setCredentials(res))
 		} catch (error: unknown) {
 			console.error((error as Error).message || 'Registration Failed');
 			toast.error((error as Error).message||'User registration failed')
