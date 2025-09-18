@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import App from './App.tsx';
+import { Toaster } from './components/ui/sonner.tsx';
 import './index.css';
 import AuthProvider from './providers/AuthProvider.tsx';
 import TodoProvider from './providers/TodoProvider.tsx';
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
 			<AuthProvider>
 				<TodoProvider>
 					<App />
+					<Toaster />
 				</TodoProvider>
 			</AuthProvider>
 		</Provider>
