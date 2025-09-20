@@ -1,11 +1,19 @@
-import { currentSelectedUser, logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
+import { useGetUserProfileQuery } from '@/redux/features/auth/authApi';
+import { useAppDispatch } from '@/redux/hooks';
 import { useNavigate } from 'react-router';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const UserProfile = () => {
 	// const { user, logout } = useAuth();
-	const user = useAppSelector(currentSelectedUser);
+	// const user = useAppSelector(currentSelectedUser);
+
+	// getting current user from rtk queries's get user profile query
+	const { data, isLoading, isError } = useGetUserProfileQuery(undefined);
+	const user = data?.user;
+	console.log(user, 'from user profile after api call');
+
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
@@ -35,14 +43,22 @@ const UserProfile = () => {
 				break;
 		}
 	};
+
+	if (isLoading) return <span>Loading profile...</span>;
+	if (isError || !user) return <span>Please Login First.!</span>;
+
 	return (
 		<div className='flex items-center justify-end p-4'>
 			<Select defaultValue='' onValueChange={handleSelectValueChange}>
 				<SelectTrigger className='w-48 bg-zinc-800 border-zinc-700 text-zinc-200'>
-					<SelectValue placeholder={user.email} />
+					<SelectValue placeholder={user.username} />
+					<Avatar className='w-6 h-6'>
+						<AvatarImage className='' src={user.avatarUrl ? user.avatarUrl : ''} />
+						<AvatarFallback>{user.firstName.slice(0, 1)}</AvatarFallback>
+					</Avatar>
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value='profile'>Profile</SelectItem>
+					<SelectItem value='profile'>{user.username} - Profile</SelectItem>
 					<SelectItem value='settings'>Settings</SelectItem>
 					<SelectItem value='logout'>Logout</SelectItem>
 				</SelectContent>

@@ -1,9 +1,21 @@
 import { env } from '@/config/env/validateEnv';
+import type { RootState } from '@/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const authApi = createApi({
 	reducerPath: 'authApi',
-	baseQuery: fetchBaseQuery({ baseUrl: env.API_BASE_URL }),
+	baseQuery: fetchBaseQuery({
+		baseUrl: env.API_BASE_URL,
+		prepareHeaders: (headers, { getState }) => {
+			const token = (getState() as RootState).auth.token;
+
+			if (token) {
+				headers.set('Authorization', `Bearer ${token}`);
+			}
+
+			return headers;
+		},
+	}),
 	endpoints: (builder) => ({
 		// register user
 		registerUser: builder.mutation({
@@ -22,7 +34,15 @@ export const authApi = createApi({
 				body: payload,
 			}),
 		}),
+
+		// get user profile
+		getUserProfile: builder.query({
+			query: () => ({
+				url: '/user/profile',
+				method: 'GET',
+			}),
+		}),
 	}),
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation } = authApi;
+export const { useRegisterUserMutation, useLoginUserMutation, useGetUserProfileQuery } = authApi;
