@@ -16,6 +16,11 @@ const UserProfile = () => {
 			</div>
 		);
 
+	const handleLogOut = () => {
+		dispatch(logoutUser());
+		setTimeout(() => navigate('/login'), 0);
+	};
+
 	const handleSelectValueChange = (value: string) => {
 		switch (value) {
 			case 'profile':
@@ -26,8 +31,7 @@ const UserProfile = () => {
 				alert('Will be implemented settings page');
 				break;
 			case 'logout':
-				dispatch(logoutUser());
-				navigate('/login');
+				handleLogOut();
 				break;
 		}
 	};

@@ -10,7 +10,7 @@ type AuthSliceType = {
 		username: string;
 		firstName: string;
 		lastName: string;
-	};
+	} | null;
 };
 
 // initial state
@@ -62,13 +62,7 @@ export const authSlice = createSlice({
 		logoutUser: (state) => {
 			state.message = '';
 			state.token = '';
-			state.user = {
-				id: '',
-				email: '',
-				username: '',
-				firstName: '',
-				lastName: '',
-			};
+			state.user = null;
 
 			// remove from local storage
 			localStorage.removeItem('auth');
