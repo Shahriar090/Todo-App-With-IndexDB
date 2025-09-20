@@ -66,6 +66,7 @@ const AddTodo = () => {
 	const selectedPriority = watch('priority');
 
 	const onSubmit = async (payload: TodoFormInputs) => {
+		console.log(payload, 'from add todo');
 		try {
 			await createTodo({
 				...payload,
@@ -185,7 +186,7 @@ const AddTodo = () => {
 					</div>
 
 					{/* Status */}
-					<div className='space-y-1'>
+					{/* <div className='space-y-1'>
 						<Label htmlFor='status' className='text-sm'>
 							Status
 						</Label>
@@ -200,7 +201,7 @@ const AddTodo = () => {
 								<SelectItem value='completed'>Completed</SelectItem>
 							</SelectContent>
 						</Select>
-					</div>
+					</div> */}
 
 					{/* Category */}
 					<div className='space-y-1'>
