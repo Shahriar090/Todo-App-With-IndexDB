@@ -28,7 +28,26 @@ export const todoApi = createApi({
 			}),
 			invalidatesTags: ['Todos'],
 		}),
+
+		// get todos with filtering
+		getTodos: builder.query<TodoType[], { category?: string; completed?: boolean }>({
+			query: (args = {}) => {
+				const params = new URLSearchParams();
+
+				if (args.category) {
+					params.append('category', args.category);
+				}
+
+				if (args.completed !== undefined) params.append('completed', args.completed ? '1' : '0');
+
+				return {
+					url: `/todos?${params.toString()}`,
+					method: 'GET',
+				};
+			},
+			providesTags: ['Todos'],
+		}),
 	}),
 });
 
-export const { useCreateTodoMutation } = todoApi;
+export const { useCreateTodoMutation, useGetTodosQuery } = todoApi;
