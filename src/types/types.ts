@@ -82,19 +82,19 @@ export const Priority = {
 export type PriorityType = (typeof Priority)[keyof typeof Priority];
 
 export type TodoType = {
-	id: string;
+	id?: string;
 	title: string;
 	description: string;
 	completed: boolean;
 	priority: PriorityType;
 	category: string;
 	dueDate: string;
-	userId: string;
-	sharedListId: string;
-	createdAt: string;
-	updatedAt: string;
-	version: number;
-	sharedListName: string;
+	userId?: string;
+	sharedListId?: string;
+	createdAt?: string;
+	updatedAt?: string;
+	version?: number;
+	sharedListName?: string;
 };
 
 // ****************************** SHARED LIST TYPE ************************************************//4
