@@ -1,5 +1,6 @@
 import { env } from '@/config/env/validateEnv';
 import type { RootState } from '@/redux/store';
+import type { TodoType } from '@/types/types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const todoApi = createApi({
@@ -16,14 +17,16 @@ export const todoApi = createApi({
 			return headers;
 		},
 	}),
+	tagTypes: ['Todos'],
 	endpoints: (builder) => ({
 		// create a new todo
-		createTodo: builder.mutation({
+		createTodo: builder.mutation<TodoType, Partial<TodoType>>({
 			query: (payload) => ({
 				url: '/todos',
 				method: 'POST',
 				body: payload,
 			}),
+			invalidatesTags: ['Todos'],
 		}),
 	}),
 });
