@@ -1,11 +1,13 @@
 import { currentSelectedUser, logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useNavigate } from 'react-router';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const UserProfile = () => {
 	// const { user, logout } = useAuth();
 	const user = useAppSelector(currentSelectedUser);
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 
 	if (!user)
 		return (
@@ -25,6 +27,7 @@ const UserProfile = () => {
 				break;
 			case 'logout':
 				dispatch(logoutUser());
+				navigate('/login');
 				break;
 		}
 	};
