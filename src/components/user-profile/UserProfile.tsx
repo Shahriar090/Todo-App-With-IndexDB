@@ -1,10 +1,11 @@
-import { currentSelectedUser } from '@/redux/features/auth/auth-slice/authSlice';
-import { useAppSelector } from '@/redux/hooks';
+import { currentSelectedUser, logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const UserProfile = () => {
 	// const { user, logout } = useAuth();
 	const user = useAppSelector(currentSelectedUser);
+	const dispatch = useAppDispatch();
 
 	if (!user)
 		return (
@@ -23,7 +24,7 @@ const UserProfile = () => {
 				alert('Will be implemented settings page');
 				break;
 			case 'logout':
-				// logout();
+				dispatch(logoutUser());
 				break;
 		}
 	};

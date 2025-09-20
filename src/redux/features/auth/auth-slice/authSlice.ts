@@ -40,7 +40,7 @@ export const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		setCredentials: (state, action: PayloadAction<AuthSliceType>) => {
+		registerNewUser: (state, action: PayloadAction<AuthSliceType>) => {
 			state.message = action.payload.message;
 			state.token = action.payload.token;
 			state.user = action.payload.user;
@@ -49,7 +49,7 @@ export const authSlice = createSlice({
 			localStorage.setItem('auth', JSON.stringify(state));
 		},
 
-		clearCredentials: (state) => {
+		logoutUser: (state) => {
 			state.message = '';
 			state.token = '';
 			state.user = {
@@ -66,9 +66,9 @@ export const authSlice = createSlice({
 	},
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const { registerNewUser, logoutUser } = authSlice.actions;
 export default authSlice.reducer;
 
 // selectors of current token and user
-export const currentSelectedToken = (state: RootState) => state.auth.token;
-export const currentSelectedUser = (state: RootState) => state.auth.user;
+export const currentSelectedToken = (state: RootState) => state?.auth?.token;
+export const currentSelectedUser = (state: RootState) => state?.auth?.user;
