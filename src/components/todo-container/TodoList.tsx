@@ -11,7 +11,6 @@ import { ScrollArea } from '../ui/scroll-area';
 const TodoList = () => {
 	const { todos, changeTodoStatus, updateTodo } = useTodo();
 
-	console.log(todos, 'from todo list');
 	// states for delete logic
 	const [selectedTodo, setSelectedTodo] = useState<DecryptedTodoType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

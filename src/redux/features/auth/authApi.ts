@@ -42,7 +42,17 @@ export const authApi = createApi({
 				method: 'GET',
 			}),
 		}),
+
+		// update user profile
+		updateUserProfile: builder.mutation({
+			query: (payload) => ({
+				url: '/user/profile',
+				method: 'PUT',
+				body: payload,
+			}),
+		}),
 	}),
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation, useGetUserProfileQuery } = authApi;
+export const { useRegisterUserMutation, useLoginUserMutation, useGetUserProfileQuery, useUpdateUserProfileMutation } =
+	authApi;

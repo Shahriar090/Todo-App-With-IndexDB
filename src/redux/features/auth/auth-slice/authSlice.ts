@@ -67,10 +67,20 @@ export const authSlice = createSlice({
 			// remove from local storage
 			localStorage.removeItem('auth');
 		},
+
+		// set auth after user data  update
+		setAuth: (state, action: PayloadAction<AuthSliceType>) => {
+			state.message = action.payload.message;
+			state.token = action.payload.token;
+			state.user = action.payload.user;
+
+			// save to local sltorage
+			localStorage.setItem('auth', JSON.stringify(state));
+		},
 	},
 });
 
-export const { registerNewUser, loginUser, logoutUser } = authSlice.actions;
+export const { registerNewUser, loginUser, logoutUser, setAuth } = authSlice.actions;
 export default authSlice.reducer;
 
 // selectors of current token and user

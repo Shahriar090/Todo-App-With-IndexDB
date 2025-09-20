@@ -1,11 +1,14 @@
 import { logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
 import { useGetUserProfileQuery } from '@/redux/features/auth/authApi';
 import { useAppDispatch } from '@/redux/hooks';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import EditUserProfileModal from '../edit-user-profile-modal/EditUserProfileModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const UserProfile = () => {
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	// const { user, logout } = useAuth();
 	// const user = useAppSelector(currentSelectedUser);
 
@@ -32,7 +35,7 @@ const UserProfile = () => {
 	const handleSelectValueChange = (value: string) => {
 		switch (value) {
 			case 'profile':
-				alert('Will be implemented profile section');
+				setIsModalOpen(true);
 				break;
 
 			case 'settings':
@@ -63,6 +66,12 @@ const UserProfile = () => {
 					<SelectItem value='logout'>Logout</SelectItem>
 				</SelectContent>
 			</Select>
+
+			{isModalOpen && (
+				<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+					<EditUserProfileModal user={user} closeModal={() => setIsModalOpen(false)} />
+				</div>
+			)}
 		</div>
 	);
 };
