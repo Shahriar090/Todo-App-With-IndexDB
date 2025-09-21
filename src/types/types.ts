@@ -30,7 +30,7 @@ export type EditModalProps = {
 	open: boolean;
 	onClose: () => void;
 	todo: TodoType | null;
-	onConfirm: (updatedTodo: { task: string; deadline: string }) => void;
+	onConfirm: (updatedTodo: TodoType) => void;
 };
 // ***************************************************************************************************//
 

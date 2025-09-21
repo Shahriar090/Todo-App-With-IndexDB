@@ -1,5 +1,4 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: removed dynamic id error  */
-import type { TodoFormInputs } from '@/config/todo/todoValidationSchema';
 import { useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
 import type { EditModalProps, TodoType } from '@/types/types';
 import { useEffect } from 'react';
@@ -52,8 +51,7 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 		}
 	}, [todo, reset]);
 
-	const onSubmit = async (payload: TodoFormInputs) => {
-		console.log(payload, 'from todo edit modal');
+	const onSubmit = async (payload: TodoType) => {
 		if (todo && !todo.id) return;
 
 		try {
