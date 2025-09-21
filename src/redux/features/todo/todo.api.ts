@@ -1,6 +1,6 @@
 import { env } from '@/config/env/validateEnv';
 import type { RootState } from '@/redux/store';
-import type { TodoType } from '@/types/types';
+import type { CategoryType, TodoType } from '@/types/types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const todoApi = createApi({
@@ -17,7 +17,7 @@ export const todoApi = createApi({
 			return headers;
 		},
 	}),
-	tagTypes: ['Todos'],
+	tagTypes: ['Todos', 'Categories'],
 	endpoints: (builder) => ({
 		// create a new todo
 		createTodo: builder.mutation<TodoType, Partial<TodoType>>({
@@ -66,7 +66,33 @@ export const todoApi = createApi({
 			}),
 			invalidatesTags: ['Todos'],
 		}),
+
+		// add category
+		addCategory: builder.mutation<CategoryType, Partial<CategoryType>>({
+			query: (payload) => ({
+				url: '/user/categories',
+				method: 'POST',
+				body: payload,
+			}),
+			invalidatesTags: ['Categories'],
+		}),
+
+		// get categories
+		getCategories: builder.query<CategoryType[], void>({
+			query: () => ({
+				url: '/user/categories',
+				method: 'GET',
+			}),
+			providesTags: ['Categories'],
+		}),
 	}),
 });
 
-export const { useCreateTodoMutation, useGetTodosQuery, useUpdateTodoMutation, useDeleteTodoMutation } = todoApi;
+export const {
+	useCreateTodoMutation,
+	useGetTodosQuery,
+	useUpdateTodoMutation,
+	useDeleteTodoMutation,
+	useAddCategoryMutation,
+	useGetCategoriesQuery,
+} = todoApi;

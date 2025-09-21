@@ -9,4 +9,4 @@ export const todoSchema = z.object({
 	completed: z.boolean().optional(),
 });
 
-// export type TodoFormInputs = z.infer<typeof todoSchema>;
+export type TodoFormInputs = z.infer<typeof todoSchema>;
