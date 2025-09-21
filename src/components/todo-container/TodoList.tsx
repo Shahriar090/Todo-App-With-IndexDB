@@ -1,6 +1,5 @@
-import { db } from '@/db/db';
-import { useGetTodosQuery, useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
-import type { DecryptedTodoType, TodoType } from '@/types/types';
+import { useDeleteTodoMutation, useGetTodosQuery, useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
+import type { TodoType } from '@/types/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
@@ -15,6 +14,8 @@ const TodoList = () => {
 	// getting todos using rtk query hook
 	const { data: todos } = useGetTodosQuery({ category: 'Programming' });
 	const [updateTodo] = useUpdateTodoMutation();
+	const [deleteTodo] = useDeleteTodoMutation();
+
 	// states for delete logic
 	const [selectedTodo, setSelectedTodo] = useState<TodoType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -47,7 +48,7 @@ const TodoList = () => {
 
 	// delete todo related logic start
 	// handle delete click handler
-	const handleDeleteClick = (todo: DecryptedTodoType) => {
+	const handleDeleteClick = (todo: TodoType) => {
 		setSelectedTodo(todo);
 		setIsModalOpen(true);
 	};
@@ -55,7 +56,13 @@ const TodoList = () => {
 	// confirm delete handler
 	const handleDeleteConfirm = async () => {
 		if (selectedTodo?.id) {
-			await db.todos.delete(selectedTodo.id);
+			try {
+				await deleteTodo(selectedTodo.id).unwrap();
+				toast.success('Todo deleted successfully');
+			} catch (error: unknown) {
+				toast.error('Failed to delete todo');
+				console.error(error as Error);
+			}
 		}
 		setIsModalOpen(false);
 		setSelectedTodo(null);
@@ -85,10 +92,11 @@ const TodoList = () => {
 									onCheckedChange={() => handleTodoToggle(todo.id as string)} // pass todo.id as string
 								/>
 								<div>
-									<p
-										className={`${isCompleted ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-medium'}`}>
+									<h2
+										className={`${isCompleted ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-semibold'}`}>
 										{todo.title}
-									</p>
+									</h2>
+									<article className='text-sm text-zinc-300'>{todo?.description}</article>
 									<p className='text-sm text-zinc-400'>
 										Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
 									</p>
@@ -122,7 +130,7 @@ const TodoList = () => {
 							open={isModalOpen}
 							onClose={() => setIsModalOpen(false)}
 							onConfirm={handleDeleteConfirm}
-							itemName={selectedTodo?.task as string}
+							itemName={selectedTodo?.title}
 						/>
 					</div>
 				)}
