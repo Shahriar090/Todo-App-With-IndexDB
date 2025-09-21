@@ -29,7 +29,7 @@ export type AuthContextType = {
 export type EditModalProps = {
 	open: boolean;
 	onClose: () => void;
-	todo: DecryptedTodoType | null;
+	todo: TodoType | null;
 	onConfirm: (updatedTodo: { task: string; deadline: string }) => void;
 };
 // ***************************************************************************************************//
@@ -82,10 +82,10 @@ export const Priority = {
 export type PriorityType = (typeof Priority)[keyof typeof Priority];
 
 export type TodoType = {
-	id?: string;
+	id: string;
 	title: string;
 	description: string;
-	completed: number;
+	completed: boolean;
 	priority: PriorityType;
 	category: string;
 	dueDate: string;

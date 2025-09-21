@@ -1,7 +1,8 @@
 import { db } from '@/db/db';
-import { useGetTodosQuery } from '@/redux/features/todo/todo.api';
+import { useGetTodosQuery, useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
 import type { DecryptedTodoType, TodoType } from '@/types/types';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
 import EditModal from '../edit-modal/EditModal';
 import { Button } from '../ui/button';
@@ -12,7 +13,8 @@ const TodoList = () => {
 	// const { todos, changeTodoStatus, updateTodo } = useTodo();
 
 	// getting todos using rtk query hook
-	const { data:todos, isLoading, isError } = useGetTodosQuery({});
+	const { data: todos } = useGetTodosQuery({ category: 'Programming' });
+	const [updateTodo] = useUpdateTodoMutation();
 	// states for delete logic
 	const [selectedTodo, setSelectedTodo] = useState<TodoType | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -28,16 +30,17 @@ const TodoList = () => {
 	};
 
 	// edit handler
-	const handleEditConfirm = async (updated: { task: string; deadline: string }) => {
-		if (!editingTodo?.id) return null;
+	const handleEditConfirm = (updated: TodoType) => {
+		if (!editingTodo?.id) return;
 
-		try {
-			await updateTodo(editingTodo?.id, updated);
-			setIsEditModalOpen(false);
-			setEditingTodo(null);
-		} catch (error: unknown) {
-			console.error(error);
-		}
+		updateTodo({ id: editingTodo.id, payload: updated })
+			.unwrap()
+			.then(() => toast.success('Todo updated successfully', { duration: 2000 }))
+			.catch((err) => console.error(err))
+			.finally(() => {
+				setIsEditModalOpen(false);
+				setEditingTodo(null);
+			});
 	};
 
 	// edit todo related logc end
@@ -72,45 +75,45 @@ const TodoList = () => {
 	return (
 		<ScrollArea className='h-[400px] rounded-md'>
 			<div className='space-y-3'>
-			{todos?.todos?.map((todo:TodoType) => {
-    const isCompleted = todo.completed === 1; // 1 means completed, 0 means pending
-    return (
-        <div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
-            <div className='flex items-center gap-3'>
-                <Checkbox
-                    checked={isCompleted}
-                    onCheckedChange={() => handleTodoToggle(todo.id as string)} // pass todo.id as string
-                />
-                <div>
-                    <p
-                        className={`${isCompleted ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-medium'}`}>
-                        {todo.title}
-                    </p>
-                    <p className='text-sm text-zinc-400'>
-                        Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
-                    </p>
-                    <p className='text-sm text-zinc-400'>Deadline: {todo.dueDate}</p>
-                    <p className={`${!isCompleted ? 'text-xs text-amber-400' : 'text-xs text-green-400'}`}>
-                        Status: {!isCompleted ? 'pending' : 'completed'}
-                    </p>
-                </div>
-            </div>
-            <div className='flex items-center gap-2'>
-                <Button
-                    onClick={() => handleEditClick(todo)}
-                    size='sm'
-                    variant='default'
-                    className='text-zinc-200 bg-zinc-800'>
-                    Edit
-                </Button>
-                <Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
-                    Delete
-                </Button>
-            </div>
-        </div>
-    );
-})}
-
+				{todos?.todos?.map((todo: TodoType) => {
+					const isCompleted = todo.completed === true;
+					return (
+						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
+							<div className='flex items-center gap-3'>
+								<Checkbox
+									checked={isCompleted}
+									onCheckedChange={() => handleTodoToggle(todo.id as string)} // pass todo.id as string
+								/>
+								<div>
+									<p
+										className={`${isCompleted ? 'line-through text-sm text-zinc-300 font-medium' : 'text-sm text-zinc-300 font-medium'}`}>
+										{todo.title}
+									</p>
+									<p className='text-sm text-zinc-400'>
+										Created On: {new Date(todo.createdAt as string).toISOString().split('T')[0]}
+									</p>
+									<p className='text-sm text-zinc-400'>Deadline: {todo.dueDate}</p>
+									<p className='text-sm text-zinc-400'>Category: {todo.category}</p>
+									<p className={`${!isCompleted ? 'text-xs text-amber-400' : 'text-xs text-green-400'}`}>
+										Status: {!isCompleted ? 'pending' : 'completed'}
+									</p>
+								</div>
+							</div>
+							<div className='flex items-center gap-2'>
+								<Button
+									onClick={() => handleEditClick(todo)}
+									size='sm'
+									variant='default'
+									className='text-zinc-200 bg-zinc-800'>
+									Edit
+								</Button>
+								<Button onClick={() => handleDeleteClick(todo)} size='sm' variant='destructive'>
+									Delete
+								</Button>
+							</div>
+						</div>
+					);
+				})}
 
 				{/* delete modal */}
 				{isModalOpen && selectedTodo && (
