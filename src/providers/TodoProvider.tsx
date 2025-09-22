@@ -40,7 +40,6 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			const decrypted = JSON.parse(decryptString(todo.encryptedData, user.email));
 			return { ...decrypted, id: todo.id };
 		});
-		// console.log(dcryptedTodo);
 		return dcryptedTodos;
 	}, [user?.id]);
 

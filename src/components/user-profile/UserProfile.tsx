@@ -15,7 +15,6 @@ const UserProfile = () => {
 	// getting current user from rtk queries's get user profile query
 	const { data, isLoading, isError } = useGetUserProfileQuery(undefined);
 	const user = data?.user;
-	console.log(user, 'from user profile after api call');
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();

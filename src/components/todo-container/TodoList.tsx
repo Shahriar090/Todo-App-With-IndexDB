@@ -7,6 +7,8 @@ import {
 } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
 import type { CategoryType, TodoType } from '@/types/types';
+import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
+import MDEditor from '@uiw/react-md-editor';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
@@ -124,6 +126,7 @@ const TodoList = () => {
 				{todosData?.todos?.map((todo: TodoType) => {
 					const isCompleted = todo.completed === true;
 					const category = getCategoryById(todo.category);
+					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
 
 					return (
 						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
@@ -133,7 +136,7 @@ const TodoList = () => {
 									onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
 								/>
 								<div className='flex-1'>
-									<h2
+									{/* <h2
 										className={`${
 											isCompleted
 												? 'line-through text-sm text-zinc-400 font-medium'
@@ -142,7 +145,20 @@ const TodoList = () => {
 										{todo.title}
 									</h2>
 
-									{todo.description && <article className='text-sm text-zinc-300 mt-1'>{todo.description}</article>}
+									{todo.description && <article className='text-sm text-zinc-300 mt-1'>{todo.description}</article>} */}
+
+									{/* Render markdown content */}
+									<div className={isCompleted ? 'line-through opacity-60' : ''}>
+										<div data-color-mode='dark' className='markdown-content'>
+											<MDEditor.Markdown
+												source={markdownContent}
+												style={{
+													backgroundColor: 'transparent',
+													color: isCompleted ? '#a1a1aa' : '#d4d4d8',
+												}}
+											/>
+										</div>
+									</div>
 
 									<div className='flex flex-wrap items-center gap-4 mt-2 text-xs text-zinc-400'>
 										<p>Created: {new Date(todo.createdAt as string).toLocaleDateString()}</p>
