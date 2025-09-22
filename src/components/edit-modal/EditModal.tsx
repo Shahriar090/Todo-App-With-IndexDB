@@ -79,6 +79,8 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 	}, [todo, reset]);
 
 	// handle markdown content change
+	// when user types anything using the markdown editor, typed things will come as 'value' and then
+	//  it will set into markdown content state as content
 	const handleMarkdownContentChange = (value?: string) => {
 		const content = value || '';
 		setMarkdownContent(content);

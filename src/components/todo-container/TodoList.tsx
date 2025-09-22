@@ -127,6 +127,7 @@ const TodoList = () => {
 					const isCompleted = todo.completed === true;
 					const category = getCategoryById(todo.category);
 					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
+					console.log(todo.title, 'from todo list========>');
 
 					return (
 						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
