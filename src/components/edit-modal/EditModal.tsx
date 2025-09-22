@@ -20,7 +20,7 @@ type CategoryFormInputs = {
 };
 
 const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
-	const [updateTodo, { isLoading }] = useUpdateTodoMutation();
+	const [_, { isLoading }] = useUpdateTodoMutation();
 	const userId = useAppSelector(currentSelectedUserId);
 	const { data: categoriesData } = useGetCategoriesQuery();
 	const [addCategory, { isLoading: isAddingCategory }] = useAddCategoryMutation();
@@ -69,17 +69,7 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 	}, [todo, reset]);
 
 	const onSubmit = async (payload: TodoType) => {
-		if (!todo?.id) return;
-
-		try {
-			await updateTodo({ id: todo.id, payload }).unwrap();
-			toast.success('Todo updated successfully', { duration: 2000 });
-			if (onConfirm) onConfirm(payload);
-			onClose();
-		} catch (error) {
-			console.error('Failed to update todo:', error);
-			toast.error('Todo update failed', { duration: 2000 });
-		}
+		if (onConfirm) onConfirm(payload);
 	};
 
 	// Handle category change

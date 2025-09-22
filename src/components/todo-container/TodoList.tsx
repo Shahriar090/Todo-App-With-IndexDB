@@ -1,6 +1,10 @@
-
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
-import { useDeleteTodoMutation, useGetCategoriesQuery, useGetTodosQuery, useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
+import {
+	useDeleteTodoMutation,
+	useGetCategoriesQuery,
+	useGetTodosQuery,
+	useUpdateTodoMutation,
+} from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
 import type { CategoryType, TodoType } from '@/types/types';
 import { useState } from 'react';
@@ -13,7 +17,7 @@ import { ScrollArea } from '../ui/scroll-area';
 
 const TodoList = () => {
 	const userId = useAppSelector(currentSelectedUserId);
-	
+
 	// getting todos and categories using rtk query hooks
 	const { data: todosData } = useGetTodosQuery({ userId });
 	const { data: categoriesData } = useGetCategoriesQuery(); // Get all categories to map names
@@ -83,9 +87,9 @@ const TodoList = () => {
 	// toggle todo status handler
 	const handleTodoToggle = async (id: string, currentStatus: boolean) => {
 		try {
-			await updateTodo({ 
-				id, 
-				payload: { completed: !currentStatus } 
+			await updateTodo({
+				id,
+				payload: { completed: !currentStatus },
 			}).unwrap();
 			toast.success('Todo status updated successfully');
 		} catch (error) {
@@ -116,11 +120,11 @@ const TodoList = () => {
 						<p>No todos found. Create your first todo!</p>
 					</div>
 				)}
-				
+
 				{todosData?.todos?.map((todo: TodoType) => {
 					const isCompleted = todo.completed === true;
 					const category = getCategoryById(todo.category);
-					
+
 					return (
 						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
 							<div className='flex items-center gap-3'>
@@ -131,31 +135,20 @@ const TodoList = () => {
 								<div className='flex-1'>
 									<h2
 										className={`${
-											isCompleted 
-												? 'line-through text-sm text-zinc-400 font-medium' 
+											isCompleted
+												? 'line-through text-sm text-zinc-400 font-medium'
 												: 'text-sm text-zinc-200 font-semibold'
-										}`}
-									>
+										}`}>
 										{todo.title}
 									</h2>
-									
-									{todo.description && (
-										<article className='text-sm text-zinc-300 mt-1'>
-											{todo.description}
-										</article>
-									)}
-									
+
+									{todo.description && <article className='text-sm text-zinc-300 mt-1'>{todo.description}</article>}
+
 									<div className='flex flex-wrap items-center gap-4 mt-2 text-xs text-zinc-400'>
-										<p>
-											Created: {new Date(todo.createdAt as string).toLocaleDateString()}
-										</p>
-										
-										{todo.dueDate && (
-											<p>
-												Due: {new Date(todo.dueDate).toLocaleDateString()}
-											</p>
-										)}
-										
+										<p>Created: {new Date(todo.createdAt as string).toLocaleDateString()}</p>
+
+										{todo.dueDate && <p>Due: {new Date(todo.dueDate).toLocaleDateString()}</p>}
+
 										{/* Priority */}
 										{todo.priority && (
 											<span className={`font-medium ${getPriorityColor(todo.priority)}`}>
@@ -167,41 +160,35 @@ const TodoList = () => {
 									{/* Category with color indicator */}
 									{category && (
 										<div className='flex items-center gap-2 mt-2'>
-											<div 
-												className='w-3 h-3 rounded-full border border-zinc-600' 
+											<div
+												className='w-3 h-3 rounded-full border border-zinc-600'
 												style={{ backgroundColor: category.color }}
 												title={`Category: ${category.name}`}
 											/>
-											<span className='text-xs text-zinc-400'>
-												{category.name}
-											</span>
+											<span className='text-xs text-zinc-400'>{category.name}</span>
 										</div>
 									)}
 
 									{/* Status */}
-									<p className={`text-xs mt-1 font-medium ${
-										!isCompleted ? 'text-amber-400' : 'text-green-400'
-									}`}>
+									<p className={`text-xs mt-1 font-medium ${!isCompleted ? 'text-amber-400' : 'text-green-400'}`}>
 										Status: {!isCompleted ? 'Pending' : 'Completed'}
 									</p>
 								</div>
 							</div>
-							
+
 							<div className='flex items-center gap-2'>
 								<Button
 									onClick={() => handleEditClick(todo)}
 									size='sm'
 									variant='default'
-									className='text-zinc-200 bg-zinc-800 hover:bg-zinc-700'
-								>
+									className='text-zinc-200 bg-zinc-800 hover:bg-zinc-700'>
 									Edit
 								</Button>
-								<Button 
-									onClick={() => handleDeleteClick(todo)} 
-									size='sm' 
+								<Button
+									onClick={() => handleDeleteClick(todo)}
+									size='sm'
 									variant='destructive'
-									className='hover:bg-red-700'
-								>
+									className='hover:bg-red-700'>
 									Delete
 								</Button>
 							</div>
@@ -220,7 +207,7 @@ const TodoList = () => {
 						/>
 					</div>
 				)}
-				
+
 				{/* edit modal */}
 				{isEditModalOpen && editingTodo && (
 					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
