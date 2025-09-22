@@ -1,10 +1,12 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: unique id related rules were removed */
 import { todoSchema, type TodoFormInputs } from '@/config/todo/todoValidationSchema';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
-import { useCreateTodoMutation } from '@/redux/features/todo/todo.api';
+import { useAddCategoryMutation, useCreateTodoMutation, useGetCategoriesQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import type { PriorityType } from '@/types/types';
+import type { CategoryType, PriorityType } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus, X } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
@@ -13,36 +15,23 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
+// Category form type
+type CategoryFormInputs = {
+	name: string;
+	color: string;
+};
+
 const AddTodo = () => {
-	// const { addTodo } = useTodo();
-
-	// const [task, setTask] = useState('');
-	// const [status, setStatus] = useState<'pending' | 'completed'>('pending');
-	// const [deadline, setDeadline] = useState('');
-
-	// // form submit handler
-	// const handleSubmit = async (event: React.FormEvent) => {
-	// 	event.preventDefault();
-
-	// 	if (!task.trim() || !deadline) {
-	// 		alert('Please fill in all fields!');
-	// 		return;
-	// 	}
-
-	// 	await addTodo({
-	// 		task,
-	// 		status,
-	// 		deadline,
-	// 		// createdAt: new Date().toString(),
-	// 	});
-
-	// 	// reset the form after submission
-	// 	setTask('');
-	// 	setStatus('pending');
-	// 	setDeadline('');
-	// };
 	const [createTodo, { isLoading, isError }] = useCreateTodoMutation();
 	const userId = useAppSelector(currentSelectedUserId);
+	const { data } = useGetCategoriesQuery();
+	const [addCategory, { isLoading: isAddingCategory }] = useAddCategoryMutation();
+
+	// filtering categories to show user specific categories
+	const userSpecificCategories = data?.categories.filter((category) => category.userId === userId);
+
+	// Modal state
+	const [showCategoryModal, setShowCategoryModal] = useState(false);
 
 	const {
 		register,
@@ -63,10 +52,25 @@ const AddTodo = () => {
 		},
 	});
 
+	// Category form
+	const {
+		register: registerCategory,
+		handleSubmit: handleSubmitCategory,
+		formState: { errors: categoryErrors },
+		reset: resetCategory,
+		watch: watchCategory,
+	} = useForm<CategoryFormInputs>({
+		defaultValues: {
+			name: '',
+			color: '#3b82f6', // Default blue color
+		},
+	});
+
 	const selectedPriority = watch('priority');
+	const selectedCategory = watch('category');
+	const selectedColor = watchCategory('color');
 
 	const onSubmit = async (payload: TodoFormInputs) => {
-		console.log(payload, 'from add todo');
 		try {
 			await createTodo({
 				...payload,
@@ -81,159 +85,223 @@ const AddTodo = () => {
 			toast.error('Todo creation failed.!', { duration: 2000 });
 		}
 	};
+
+	// Handle category change
+	const handleCategoryChange = (value: string) => {
+		if (value === '__new__') {
+			setShowCategoryModal(true);
+		} else {
+			setValue('category', value);
+		}
+	};
+
+	// Handle category creation
+	const onCategorySubmit = async (payload: CategoryFormInputs) => {
+		try {
+			const newCat = await addCategory({
+				name: payload.name,
+				color: payload.color,
+				userId,
+			}).unwrap();
+
+			setValue('category', newCat.id);
+			toast.success('Category created successfully!');
+			setShowCategoryModal(false);
+			resetCategory();
+		} catch (error) {
+			console.error('Failed to create category:', error);
+			toast.error('Failed to create category');
+		}
+	};
+
+	const closeCategoryModal = () => {
+		setShowCategoryModal(false);
+		resetCategory();
+	};
+
 	return (
-		// <Card className='bg-zinc-900 border-zinc-700 text-zinc-200 '>
-		// 	<CardHeader>
-		// 		<CardTitle>Add New Todo</CardTitle>
-		// 	</CardHeader>
-		// 	<CardContent className='space-y-4'>
-		// 		<form onSubmit={handleSubmit} className='space-y-8'>
-		// 			<div className='space-y-1'>
-		// 				<Label htmlFor='task' className='text-sm'>
-		// 					Task
-		// 				</Label>
-		// 				<Input
-		// 					id='task'
-		// 					value={task}
-		// 					onChange={(e) => setTask(e.target.value)}
-		// 					placeholder='Enter your task'
-		// 					className='bg-zinc-800 border-zinc-700 py-5'
-		// 				/>
-		// 			</div>
+		<>
+			<Card className='bg-zinc-900 border-zinc-700 text-zinc-200'>
+				<CardHeader>
+					<CardTitle>Add New Todo</CardTitle>
+				</CardHeader>
+				<CardContent className='space-y-4'>
+					<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+						{/* Title */}
+						<div className='space-y-1'>
+							<Label htmlFor='title' className='text-sm'>
+								Title
+							</Label>
+							<Input
+								id='title'
+								placeholder='Enter todo title'
+								className='bg-zinc-800 border-zinc-700 py-5'
+								{...register('title')}
+							/>
+							{errors.title && <p className='text-red-500 text-sm'>{errors.title.message}</p>}
+						</div>
 
-		// 			<div className='space-y-1'>
-		// 				<Label htmlFor='status' className='text-sm'>
-		// 					Status
-		// 				</Label>
-		// 				<Select value={status} onValueChange={(value) => setStatus(value as 'pending' | 'completed')}>
-		// 					<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
-		// 						<SelectValue placeholder='Select status' />
-		// 					</SelectTrigger>
-		// 					<SelectContent>
-		// 						<SelectItem value='pending'>Pending</SelectItem>
-		// 						<SelectItem value='completed'>Completed</SelectItem>
-		// 					</SelectContent>
-		// 				</Select>
-		// 			</div>
+						{/* Description */}
+						<div className='space-y-1'>
+							<Label htmlFor='description' className='text-sm'>
+								Description
+							</Label>
+							<Input
+								id='description'
+								placeholder='Optional description'
+								className='bg-zinc-800 border-zinc-700 py-5'
+								{...register('description')}
+							/>
+						</div>
 
-		// 			<div className='space-y-1'>
-		// 				<Label htmlFor='deadline' className='text-sm'>
-		// 					Deadline
-		// 				</Label>
-		// 				<Input
-		// 					type='date'
-		// 					id='deadline'
-		// 					value={deadline}
-		// 					onChange={(e) => setDeadline(e.target.value)}
-		// 					className='bg-zinc-800 border-zinc-700 py-5'
-		// 				/>
-		// 			</div>
+						{/* Priority */}
+						<div className='space-y-1'>
+							<Label htmlFor='priority' className='text-sm'>
+								Priority
+							</Label>
+							<Select value={selectedPriority} onValueChange={(value) => setValue('priority', value as PriorityType)}>
+								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
+									<SelectValue placeholder='Select priority' />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='low'>Low</SelectItem>
+									<SelectItem value='medium'>Medium</SelectItem>
+									<SelectItem value='high'>High</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 
-		// 			<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5'>
-		// 				Add Todo
-		// 			</Button>
-		// 		</form>
-		// 	</CardContent>
-		// </Card>
-		<Card className='bg-zinc-900 border-zinc-700 text-zinc-200'>
-			<CardHeader>
-				<CardTitle>Add New Todo</CardTitle>
-			</CardHeader>
-			<CardContent className='space-y-4'>
-				<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-					{/* Title */}
-					<div className='space-y-1'>
-						<Label htmlFor='title' className='text-sm'>
-							Title
-						</Label>
-						<Input
-							id='title'
-							placeholder='Enter todo title'
-							className='bg-zinc-800 border-zinc-700 py-5'
-							{...register('title')}
-						/>
-						{errors.title && <p className='text-red-500 text-sm'>{errors.title.message}</p>}
+						{/* Category */}
+						<div className='space-y-1'>
+							<Label htmlFor='category' className='text-sm'>
+								Category
+							</Label>
+							<Select value={selectedCategory} onValueChange={handleCategoryChange}>
+								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
+									<SelectValue placeholder='Select category' />
+								</SelectTrigger>
+								<SelectContent>
+									{userSpecificCategories?.map((cat: CategoryType) => (
+										<SelectItem key={cat.id} value={cat.id}>
+											<div className='flex items-center gap-2'>
+												<div className='w-3 h-3 rounded-full' style={{ backgroundColor: cat.color }} />
+												{cat.name}
+											</div>
+										</SelectItem>
+									))}
+									<SelectItem value='__new__'>
+										<div className='flex items-center gap-2'>
+											<Plus className='w-4 h-4' />
+											Add new category
+										</div>
+									</SelectItem>
+								</SelectContent>
+							</Select>
+							{errors.category && <p className='text-red-500 text-sm'>{errors.category.message}</p>}
+						</div>
+
+						{/* Due Date */}
+						<div className='space-y-1'>
+							<Label htmlFor='dueDate' className='text-sm'>
+								Due Date
+							</Label>
+							<Input type='date' id='dueDate' className='bg-zinc-800 border-zinc-700 py-5' {...register('dueDate')} />
+							{errors.dueDate && <p className='text-red-500 text-sm'>{errors.dueDate.message}</p>}
+						</div>
+
+						<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5' disabled={isLoading}>
+							{isLoading ? 'Adding...' : 'Add Todo'}
+						</Button>
+
+						{isError && <p className='text-red-500 text-sm'>Failed to create todo. Try again!</p>}
+					</form>
+				</CardContent>
+			</Card>
+
+			{/* Category Creation Modal */}
+			{showCategoryModal && (
+				<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+					<div className='bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md mx-4'>
+						<div className='flex items-center justify-between mb-4'>
+							<h2 className='text-lg font-semibold text-zinc-200'>Create New Category</h2>
+							<Button
+								variant='ghost'
+								size='sm'
+								onClick={closeCategoryModal}
+								className='text-zinc-400 hover:text-zinc-200 p-1'>
+								<X className='w-4 h-4' />
+							</Button>
+						</div>
+
+						<form onSubmit={handleSubmitCategory(onCategorySubmit)} className='space-y-4'>
+							{/* Category Name */}
+							<div className='space-y-1'>
+								<Label htmlFor='categoryName' className='text-sm text-zinc-200'>
+									Category Name
+								</Label>
+								<Input
+									id='categoryName'
+									placeholder='Enter category name'
+									className='bg-zinc-800 border-zinc-700 py-3'
+									{...registerCategory('name', { required: 'Category name is required' })}
+								/>
+								{categoryErrors.name && <p className='text-red-500 text-sm'>{categoryErrors.name.message}</p>}
+							</div>
+
+							{/* Category Color */}
+							<div className='space-y-1'>
+								<Label htmlFor='categoryColor' className='text-sm text-zinc-200'>
+									Category Color
+								</Label>
+								<div className='flex items-center gap-3'>
+									<input
+										id='categoryColor'
+										type='color'
+										className='w-12 h-10 rounded border border-zinc-700 bg-zinc-800 cursor-pointer'
+										{...registerCategory('color')}
+									/>
+									<Input
+										placeholder='#3b82f6'
+										value={selectedColor}
+										onChange={(e) => registerCategory('color').onChange(e)}
+										className='bg-zinc-800 border-zinc-700 py-3 flex-1'
+									/>
+								</div>
+								{categoryErrors.color && <p className='text-red-500 text-sm'>{categoryErrors.color.message}</p>}
+							</div>
+
+							{/* Color Preview */}
+							<div className='flex items-center gap-2 text-sm text-zinc-400'>
+								<span>Preview:</span>
+								<div className='flex items-center gap-2'>
+									<div
+										className='w-4 h-4 rounded-full border border-zinc-600'
+										style={{ backgroundColor: selectedColor }}
+									/>
+									<span className='text-zinc-200'>Sample Category</span>
+								</div>
+							</div>
+
+							<div className='flex gap-3 pt-2'>
+								<Button
+									type='button'
+									variant='outline'
+									onClick={closeCategoryModal}
+									className='flex-1 bg-transparent border-zinc-700 text-zinc-200 hover:bg-zinc-800'>
+									Cancel
+								</Button>
+								<Button
+									type='submit'
+									disabled={isAddingCategory}
+									className='flex-1 bg-blue-600 hover:bg-blue-700 text-white'>
+									{isAddingCategory ? 'Creating...' : 'Create Category'}
+								</Button>
+							</div>
+						</form>
 					</div>
-
-					{/* Description */}
-					<div className='space-y-1'>
-						<Label htmlFor='description' className='text-sm'>
-							Description
-						</Label>
-						<Input
-							id='description'
-							placeholder='Optional description'
-							className='bg-zinc-800 border-zinc-700 py-5'
-							{...register('description')}
-						/>
-					</div>
-
-					{/* Priority */}
-					<div className='space-y-1'>
-						<Label htmlFor='priority' className='text-sm'>
-							Priority
-						</Label>
-						<Select value={selectedPriority} onValueChange={(value) => setValue('priority', value as PriorityType)}>
-							<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
-								<SelectValue placeholder='Select priority' />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value='low'>Low</SelectItem>
-								<SelectItem value='medium'>Medium</SelectItem>
-								<SelectItem value='high'>High</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{/* Status */}
-					{/* <div className='space-y-1'>
-						<Label htmlFor='status' className='text-sm'>
-							Status
-						</Label>
-						<Select
-							value={watch('completed') ? 'completed' : 'pending'}
-							onValueChange={(value) => setValue('completed', value === 'completed')}>
-							<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
-								<SelectValue placeholder='Select status' />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value='pending'>Pending</SelectItem>
-								<SelectItem value='completed'>Completed</SelectItem>
-							</SelectContent>
-						</Select>
-					</div> */}
-
-					{/* Category */}
-					<div className='space-y-1'>
-						<Label htmlFor='category' className='text-sm'>
-							Category
-						</Label>
-						<Input
-							id='category'
-							placeholder='Enter category'
-							className='bg-zinc-800 border-zinc-700 py-5'
-							{...register('category')}
-						/>
-						{errors.category && <p className='text-red-500 text-sm'>{errors.category.message}</p>}
-					</div>
-
-					{/* Due Date */}
-					<div className='space-y-1'>
-						<Label htmlFor='dueDate' className='text-sm'>
-							Due Date
-						</Label>
-						<Input type='date' id='dueDate' className='bg-zinc-800 border-zinc-700 py-5' {...register('dueDate')} />
-						{errors.dueDate && <p className='text-red-500 text-sm'>{errors.dueDate.message}</p>}
-					</div>
-
-					<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5' disabled={isLoading}>
-						{isLoading ? 'Adding...' : 'Add Todo'}
-					</Button>
-
-					{isError && <p className='text-red-500 text-sm'>Failed to create todo. Try again!</p>}
-				</form>
-			</CardContent>
-		</Card>
+				</div>
+			)}
+		</>
 	);
 };
 

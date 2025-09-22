@@ -97,6 +97,10 @@ export type TodoType = {
 	sharedListName?: string;
 };
 
+export type TodoResponseType = {
+	todos: TodoType[];
+};
+
 // ****************************** SHARED LIST TYPE ************************************************//4
 export type SharedList = {
 	id: string;
@@ -117,6 +121,10 @@ export type CategoryType = {
 	color: string;
 	userId: string;
 	createdAt: string;
+};
+
+export type CategoriesResponse = {
+	categories: CategoryType[];
 };
 
 // ************************************************* AUTH RESPONSE TYPE *********************************//

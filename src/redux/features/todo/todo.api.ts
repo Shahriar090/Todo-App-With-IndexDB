@@ -1,6 +1,6 @@
 import { env } from '@/config/env/validateEnv';
 import type { RootState } from '@/redux/store';
-import type { CategoryType, TodoType } from '@/types/types';
+import type { CategoriesResponse, CategoryType, TodoResponseType, TodoType } from '@/types/types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const todoApi = createApi({
@@ -30,15 +30,21 @@ export const todoApi = createApi({
 		}),
 
 		// get todos with filtering
-		getTodos: builder.query<TodoType[], { category?: string; completed?: boolean }>({
+		getTodos: builder.query<TodoResponseType, { userId?: string; category?: string; completed?: boolean }>({
 			query: (args = {}) => {
 				const params = new URLSearchParams();
+
+				if (args.userId) {
+					params.append('userId', args.userId);
+				}
 
 				if (args.category) {
 					params.append('category', args.category);
 				}
 
-				if (args.completed !== undefined) params.append('completed', args.completed ? '1' : '0');
+				if (args.completed !== undefined) {
+					params.append('completed', args.completed ? '1' : '0');
+				}
 
 				return {
 					url: `/todos?${params.toString()}`,
@@ -78,7 +84,7 @@ export const todoApi = createApi({
 		}),
 
 		// get categories
-		getCategories: builder.query<CategoryType[], void>({
+		getCategories: builder.query<CategoriesResponse, void>({
 			query: () => ({
 				url: '/user/categories',
 				method: 'GET',
