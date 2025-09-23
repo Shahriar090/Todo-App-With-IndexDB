@@ -4,7 +4,10 @@ import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlic
 import { useAddCategoryMutation, useCreateTodoMutation, useGetCategoriesQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
 import type { CategoryType, PriorityType } from '@/types/types';
+import { extractDescriptionFromMarkdown } from '@/utils/markdown-utils/extractDescription';
+import { extractTitleFromMarkdownContent } from '@/utils/markdown-utils/extractTitle';
 import { zodResolver } from '@hookform/resolvers/zod';
+import MDEditor from '@uiw/react-md-editor';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -32,6 +35,8 @@ const AddTodo = () => {
 
 	// Modal state
 	const [showCategoryModal, setShowCategoryModal] = useState(false);
+	// Markdown editor state
+	const [markdownContent, setMarkdownContent] = useState('');
 
 	const {
 		register,
@@ -70,15 +75,38 @@ const AddTodo = () => {
 	const selectedCategory = watch('category');
 	const selectedColor = watchCategory('color');
 
+	// handle markdown content change
+	// when user types anything using the markdown editor, typed things will come as 'value' and then
+	//  it will set into markdown content state as content
+	const handleMarkdownContentChange = (value?: string) => {
+		const content = value || '';
+		setMarkdownContent(content);
+
+		// Extract title and description from markdown and update form
+		const extractedTitle = extractTitleFromMarkdownContent(content);
+		const extractedDescription = extractDescriptionFromMarkdown(content);
+
+		setValue('title', extractedTitle);
+		setValue('description', extractedDescription);
+	};
+
 	const onSubmit = async (payload: TodoFormInputs) => {
+		// Extract final title and description from current markdown content
+		const finalTitle = extractTitleFromMarkdownContent(markdownContent);
+		const finalDescription = extractDescriptionFromMarkdown(markdownContent);
+
+		const finalPayload = {
+			...payload,
+			title: finalTitle,
+			description: finalDescription,
+			completed: payload.completed ?? false,
+			userId: userId,
+		};
 		try {
-			await createTodo({
-				...payload,
-				completed: payload.completed ?? false,
-				userId: userId,
-			}).unwrap();
+			await createTodo(finalPayload).unwrap();
 
 			reset(); // reset form after successful creation
+			setMarkdownContent(''); //reset markdown content manually
 			toast.success('Todo created successfully', { duration: 2000 });
 		} catch (error) {
 			console.error('Failed to create todo:', error);
@@ -128,7 +156,7 @@ const AddTodo = () => {
 				<CardContent className='space-y-4'>
 					<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 						{/* Title */}
-						<div className='space-y-1'>
+						{/* <div className='space-y-1'>
 							<Label htmlFor='title' className='text-sm'>
 								Title
 							</Label>
@@ -139,10 +167,10 @@ const AddTodo = () => {
 								{...register('title')}
 							/>
 							{errors.title && <p className='text-red-500 text-sm'>{errors.title.message}</p>}
-						</div>
+						</div> */}
 
 						{/* Description */}
-						<div className='space-y-1'>
+						{/* <div className='space-y-1'>
 							<Label htmlFor='description' className='text-sm'>
 								Description
 							</Label>
@@ -152,8 +180,32 @@ const AddTodo = () => {
 								className='bg-zinc-800 border-zinc-700 py-5'
 								{...register('description')}
 							/>
+						</div> */}
+						{/* Markdown Editor for Title and Description */}
+						<div className='space-y-1'>
+							<Label className='text-sm'>Content (Enter title in the first line, then add description below)</Label>
+							<div className='rounded-lg overflow-hidden border border-zinc-700'>
+								<MDEditor
+									value={markdownContent}
+									onChange={handleMarkdownContentChange}
+									preview='edit'
+									hideToolbar={false}
+									textareaProps={{
+										placeholder: '# Enter your todo title here\n\nAdd your description here with markdown support...',
+										style: {
+											fontSize: 14,
+											backgroundColor: '#27272a',
+											color: '#d4d4d8',
+										},
+									}}
+									height={200}
+									data-color-mode='dark'
+								/>
+							</div>
+							<p className='text-xs text-zinc-500'>
+								Tip: Start with # for the title, then add your description below with full markdown support
+							</p>
 						</div>
-
 						{/* Priority */}
 						<div className='space-y-1'>
 							<Label htmlFor='priority' className='text-sm'>

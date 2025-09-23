@@ -41,8 +41,6 @@ const TodoList = () => {
 		if (!categoriesData?.categories) return null;
 		return categoriesData.categories.find((cat: CategoryType) => cat.id === categoryId) || null;
 	};
-	console.log(categoriesData,'categories data')
-
 	// edit todo related logic starts
 	const handleEditClick = (todo: TodoType) => {
 		setEditingTodo(todo);
@@ -132,8 +130,6 @@ const TodoList = () => {
 		{todosData?.todos?.map((todo: TodoType) => {
 			const isCompleted = todo.completed === true;
 			const category = getCategoryById(todo.category);
-				console.log(category,'category data')
-				console.log(todo.category,'todo category')
 
 			const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
 
