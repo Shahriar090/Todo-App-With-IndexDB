@@ -34,7 +34,7 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 	// Markdown editor state
 	const [markdownContent, setMarkdownContent] = useState('');
 
-	const { register, handleSubmit, reset, setValue, watch } = useForm<TodoType>({
+	const { register, handleSubmit, reset, setValue } = useForm<TodoType>({
 		defaultValues: {
 			title: '',
 			description: '',
@@ -58,8 +58,8 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 		},
 	});
 
-	const selectedPriority = watch('priority');
-	const selectedCategory = watch('category');
+	// const selectedPriority = watch('priority');
+	// const selectedCategory = watch('category');
 	const selectedColor = watchCategory('color');
 
 	useEffect(() => {
@@ -207,7 +207,10 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 							<Label htmlFor='priority' className='text-sm'>
 								Priority
 							</Label>
-							<Select value={selectedPriority} onValueChange={(value) => setValue('priority', value as PriorityType)}>
+							<Select
+								// value={selectedPriority}
+								defaultValue={todo?.priority}
+								onValueChange={(value) => setValue('priority', value as PriorityType)}>
 								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
 									<SelectValue placeholder='Select priority' />
 								</SelectTrigger>
@@ -224,7 +227,10 @@ const EditModal = ({ open, onClose, todo, onConfirm }: EditModalProps) => {
 							<Label htmlFor='category' className='text-sm'>
 								Category
 							</Label>
-							<Select value={selectedCategory} onValueChange={handleCategoryChange}>
+							<Select
+								// value={selectedCategory}
+								defaultValue={todo?.category}
+								onValueChange={handleCategoryChange}>
 								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
 									<SelectValue placeholder='Select category' />
 								</SelectTrigger>
