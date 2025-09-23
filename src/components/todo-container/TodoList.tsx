@@ -9,10 +9,12 @@ import { useAppSelector } from '@/redux/hooks';
 import type { CategoryType, TodoType } from '@/types/types';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
 import MDEditor from '@uiw/react-md-editor';
+import { PenBox, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
 import EditModal from '../edit-modal/EditModal';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { ScrollArea } from '../ui/scroll-area';
@@ -39,6 +41,7 @@ const TodoList = () => {
 		if (!categoriesData?.categories) return null;
 		return categoriesData.categories.find((cat: CategoryType) => cat.id === categoryId) || null;
 	};
+	console.log(categoriesData,'categories data')
 
 	// edit todo related logic starts
 	const handleEditClick = (todo: TodoType) => {
@@ -115,129 +118,149 @@ const TodoList = () => {
 	};
 
 	return (
-		<ScrollArea className='h-[400px] rounded-md'>
-			<div className='space-y-3'>
-				{todosData?.todos?.length === 0 && (
-					<div className='text-center text-zinc-400 py-8'>
-						<p>No todos found. Create your first todo!</p>
-					</div>
-				)}
+		<ScrollArea className="h-[500px] rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+	<div className="space-y-4">
+		{/* Empty state */}
+		{todosData?.todos?.length === 0 && (
+			<div className="text-center text-zinc-400 py-12 rounded-lg border border-dashed border-zinc-700">
+				<p className="text-sm font-medium">No todos found</p>
+				<p className="text-xs mt-1 text-zinc-500">Start by creating your first todo!</p>
+			</div>
+		)}
 
-				{todosData?.todos?.map((todo: TodoType) => {
-					const isCompleted = todo.completed === true;
-					const category = getCategoryById(todo.category);
-					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
-					console.log(todo.title, 'from todo list========>');
+		{/* Todo items */}
+		{todosData?.todos?.map((todo: TodoType) => {
+			const isCompleted = todo.completed === true;
+			const category = getCategoryById(todo.category);
+				console.log(category,'category data')
+				console.log(todo.category,'todo category')
 
-					return (
-						<div key={todo.id} className='flex items-center justify-between border border-zinc-700 rounded-md p-3'>
-							<div className='flex items-center gap-3'>
-								<Checkbox
-									checked={isCompleted}
-									onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
+			const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
+
+			return (
+				<div
+					key={todo.id}
+					className="flex items-start justify-between rounded-xl border border-zinc-700 cursor-pointer bg-zinc-800/50 p-4 shadow-sm hover:border-zinc-600 transition-colors">
+					
+					{/* Left side */}
+					<div className="flex gap-3 flex-1">
+						{/* Checkbox */}
+						<Checkbox
+							checked={isCompleted}
+							onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
+							className="mt-1"
+						/>
+
+						{/* Content */}
+						<div className="flex-1 space-y-5">
+							{/* Markdown content */}
+							<div className={isCompleted ? 'line-through opacity-60' : ''}>
+								<MDEditor.Markdown
+									source={markdownContent}
+									style={{
+										backgroundColor: 'transparent',
+										color: isCompleted ? '#a1a1aa' : '#e4e4e7',
+										fontSize: 14,
+										lineHeight: 1.6,
+									}}
 								/>
-								<div className='flex-1'>
-									{/* <h2
-										className={`${
-											isCompleted
-												? 'line-through text-sm text-zinc-400 font-medium'
-												: 'text-sm text-zinc-200 font-semibold'
-										}`}>
-										{todo.title}
-									</h2>
-
-									{todo.description && <article className='text-sm text-zinc-300 mt-1'>{todo.description}</article>} */}
-
-									{/* Render markdown content */}
-									<div className={isCompleted ? 'line-through opacity-60' : ''}>
-										<div data-color-mode='dark' className='markdown-content'>
-											<MDEditor.Markdown
-												source={markdownContent}
-												style={{
-													backgroundColor: 'transparent',
-													color: isCompleted ? '#a1a1aa' : '#d4d4d8',
-												}}
-											/>
-										</div>
-									</div>
-
-									<div className='flex flex-wrap items-center gap-4 mt-2 text-xs text-zinc-400'>
-										<p>Created: {new Date(todo.createdAt as string).toLocaleDateString()}</p>
-
-										{todo.dueDate && <p>Due: {new Date(todo.dueDate).toLocaleDateString()}</p>}
-
-										{/* Priority */}
-										{todo.priority && (
-											<span className={`font-medium ${getPriorityColor(todo.priority)}`}>
-												Priority: {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-											</span>
-										)}
-									</div>
-
-									{/* Category with color indicator */}
-									{category && (
-										<div className='flex items-center gap-2 mt-2'>
-											<div
-												className='w-3 h-3 rounded-full border border-zinc-600'
-												style={{ backgroundColor: category.color }}
-												title={`Category: ${category.name}`}
-											/>
-											<span className='text-xs text-zinc-400'>{category.name}</span>
-										</div>
-									)}
-
-									{/* Status */}
-									<p className={`text-xs mt-1 font-medium ${!isCompleted ? 'text-amber-400' : 'text-green-400'}`}>
-										Status: {!isCompleted ? 'Pending' : 'Completed'}
-									</p>
-								</div>
 							</div>
 
-							<div className='flex items-center gap-2'>
-								<Button
-									onClick={() => handleEditClick(todo)}
-									size='sm'
-									variant='default'
-									className='text-zinc-200 bg-zinc-800 hover:bg-zinc-700'>
-									Edit
-								</Button>
-								<Button
-									onClick={() => handleDeleteClick(todo)}
-									size='sm'
-									variant='destructive'
-									className='hover:bg-red-700'>
-									Delete
-								</Button>
+							{/* Metadata badges */}
+							<div className="flex flex-wrap gap-2">
+								{/* Created */}
+								<Badge variant="secondary" className="bg-zinc-700/50 text-zinc-300">
+									Created: {new Date(todo.createdAt as string).toLocaleDateString()}
+								</Badge>
+
+								{/* Due Date */}
+								{todo.dueDate && (
+									<Badge variant="secondary" className="bg-amber-500/20 text-amber-300">
+										Due: {new Date(todo.dueDate).toLocaleDateString()}
+									</Badge>
+								)}
+
+								{/* Priority */}
+								{todo.priority && (
+									<Badge
+										variant="secondary"
+										className={`${getPriorityColor(todo.priority)} bg-zinc-700/40`}>
+										{todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+									</Badge>
+								)}
+
+								{/* Category */}
+								{category && (
+									<Badge
+										variant="secondary"
+										className="bg-zinc-700/50 text-zinc-300 flex items-center gap-1">
+										<div
+											className="w-2 h-2 rounded-full border border-zinc-600"
+											style={{ backgroundColor: category.color }}
+										/>
+										{category.name}
+									</Badge>
+								)}
+
+								{/* Status */}
+								<Badge
+									variant="secondary"
+									className={`${
+										!isCompleted ? 'bg-amber-500/20 text-amber-400' : 'bg-green-500/20 text-green-400'
+									}`}>
+									{!isCompleted ? 'Pending' : 'Completed'}
+								</Badge>
 							</div>
 						</div>
-					);
-				})}
-
-				{/* delete modal */}
-				{isModalOpen && selectedTodo && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-						<DeleteModal
-							open={isModalOpen}
-							onClose={() => setIsModalOpen(false)}
-							onConfirm={handleDeleteConfirm}
-							itemName={selectedTodo?.title}
-						/>
 					</div>
-				)}
 
-				{/* edit modal */}
-				{isEditModalOpen && editingTodo && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-						<EditModal
-							open={isEditModalOpen}
-							onClose={() => setIsEditModalOpen(false)}
-							todo={editingTodo}
-							onConfirm={handleEditConfirm}
-						/>
+					{/* Actions */}
+					<div className="flex flex-col gap-2 ml-4">
+						<Button
+							onClick={() => handleEditClick(todo)}
+							size="sm"
+							variant="outline"
+							className="bg-zinc-700/60 hover:bg-zinc-600 text-zinc-200 border-zinc-600">
+							<PenBox/> Edit
+						</Button>
+						<Button
+							onClick={() => handleDeleteClick(todo)}
+							size="sm"
+							variant="destructive"
+							className="hover:bg-red-700">
+							<Trash/> Delete
+						</Button>
 					</div>
-				)}
+				</div>
+			);
+		})}
+
+		{/* Delete Modal */}
+		{isModalOpen && selectedTodo && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+				<DeleteModal
+					open={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					onConfirm={handleDeleteConfirm}
+					itemName={selectedTodo?.title}
+				/>
 			</div>
-		</ScrollArea>
+		)}
+
+		{/* Edit Modal */}
+		{isEditModalOpen && editingTodo && (
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+				<EditModal
+					open={isEditModalOpen}
+					onClose={() => setIsEditModalOpen(false)}
+					todo={editingTodo}
+					onConfirm={handleEditConfirm}
+				/>
+			</div>
+		)}
+	</div>
+</ScrollArea>
+
 	);
 };
 
