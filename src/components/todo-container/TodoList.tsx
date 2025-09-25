@@ -7,7 +7,9 @@ import {
 	useUpdateTodoMutation,
 } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import type { CategoryType, TodoType } from '@/types/types';
+import type { TodoType } from '@/types/types';
+import { getCategoryById } from '@/utils/getCategoryById';
+import { getPriorityColor } from '@/utils/getPriorityColor';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
 import MDEditor from '@uiw/react-md-editor';
 import { PenBox, Trash } from 'lucide-react';
@@ -37,11 +39,6 @@ const TodoList = () => {
 	const [editingTodo, setEditingTodo] = useState<TodoType | null>(null);
 	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
-	// Simple helper function to get category by id
-	const getCategoryById = (categoryId: string): CategoryType | null => {
-		if (!categoriesData?.categories) return null;
-		return categoriesData.categories.find((cat: CategoryType) => cat.id === categoryId) || null;
-	};
 	// edit todo related logic starts
 	const handleEditClick = (todo: TodoType) => {
 		setEditingTodo(todo);
@@ -102,20 +99,6 @@ const TodoList = () => {
 		}
 	};
 
-	// Get priority badge color
-	const getPriorityColor = (priority: string) => {
-		switch (priority?.toLowerCase()) {
-			case 'high':
-				return 'text-red-400';
-			case 'medium':
-				return 'text-yellow-400';
-			case 'low':
-				return 'text-green-400';
-			default:
-				return 'text-zinc-400';
-		}
-	};
-
 	// pagination related logic starts
 	const todos = todosData?.todos || [];
 
@@ -144,7 +127,7 @@ const TodoList = () => {
 				{/* Todo items */}
 				{currentItems.map((todo: TodoType) => {
 					const isCompleted = todo.completed === true;
-					const category = getCategoryById(todo.category);
+					const category = getCategoryById(todo.category, categoriesData!);
 
 					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
 
@@ -240,7 +223,7 @@ const TodoList = () => {
 						</div>
 					);
 				})}
-			{/* pagination buttons */}
+				{/* pagination buttons */}
 				<div className='flex justify-center gap-2 mt-4'>
 					<Button size='sm' onClick={goToFirstPage} disabled={currentPage === 1}>
 						First
