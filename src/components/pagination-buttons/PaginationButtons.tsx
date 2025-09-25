@@ -1,4 +1,4 @@
-import type { PaginationButtonsPropsTypes } from '@/types/pagination/paginationButtonsComponentTypes';
+import type { PaginationButtonsPropsTypes } from '@/types/pagination-types/paginationButtonsComponentTypes';
 import { Button } from '../ui/button';
 
 const PaginationButtons = ({

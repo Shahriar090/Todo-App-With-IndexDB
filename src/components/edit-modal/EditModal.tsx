@@ -2,7 +2,7 @@
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import { useAddCategoryMutation, useGetCategoriesQuery, useUpdateTodoMutation } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import type { CategoryType, EditModalProps, PriorityType, TodoType } from '@/types/types';
+import type { CategoryType, EditModalProps, PriorityType, TodoType } from '@/types';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
 import { extractDescriptionFromMarkdown } from '@/utils/markdown-utils/extractDescription';
 import { extractTitleFromMarkdownContent } from '@/utils/markdown-utils/extractTitle';
