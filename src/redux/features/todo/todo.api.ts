@@ -1,6 +1,6 @@
 import { env } from '@/config/env/validateEnv';
 import type { RootState } from '@/redux/store';
-import type { CategoriesResponse, CategoryType, TodoResponseType, TodoType } from '@/types/types';
+import type { CategoriesResponse, CategoryType, TodoResponseType, TodoType } from '@/types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const todoApi = createApi({
