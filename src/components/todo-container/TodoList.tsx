@@ -1,3 +1,4 @@
+import { usePagination } from '@/hooks/usePagination';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import {
 	useDeleteTodoMutation,
@@ -115,148 +116,181 @@ const TodoList = () => {
 		}
 	};
 
+	// pagination related logic starts
+	const todos = todosData?.todos || [];
+
+	const {
+		currentPage,
+		totalPages,
+		currentItems,
+		goToSpecificPage,
+		goToNextPage,
+		goToPreviousPage,
+		goToFirstPage,
+		goToLastPage,
+	} = usePagination({ items: todos, itemsPerPage: 2 });
+
 	return (
-		<ScrollArea className="h-[500px] rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-	<div className="space-y-4">
-		{/* Empty state */}
-		{todosData?.todos?.length === 0 && (
-			<div className="text-center text-zinc-400 py-12 rounded-lg border border-dashed border-zinc-700">
-				<p className="text-sm font-medium">No todos found</p>
-				<p className="text-xs mt-1 text-zinc-500">Start by creating your first todo!</p>
-			</div>
-		)}
+		<ScrollArea className='h-[500px] rounded-lg border border-zinc-800 bg-zinc-900 p-4'>
+			<div className='space-y-4'>
+				{/* Empty state */}
+				{todosData?.todos?.length === 0 && (
+					<div className='text-center text-zinc-400 py-12 rounded-lg border border-dashed border-zinc-700'>
+						<p className='text-sm font-medium'>No todos found</p>
+						<p className='text-xs mt-1 text-zinc-500'>Start by creating your first todo!</p>
+					</div>
+				)}
 
-		{/* Todo items */}
-		{todosData?.todos?.map((todo: TodoType) => {
-			const isCompleted = todo.completed === true;
-			const category = getCategoryById(todo.category);
+				{/* Todo items */}
+				{currentItems.map((todo: TodoType) => {
+					const isCompleted = todo.completed === true;
+					const category = getCategoryById(todo.category);
 
-			const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
+					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
 
-			return (
-				<div
-					key={todo.id}
-					className="flex items-start justify-between rounded-xl border border-zinc-700 cursor-pointer bg-zinc-800/50 p-4 shadow-sm hover:border-zinc-600 transition-colors">
-					
-					{/* Left side */}
-					<div className="flex gap-3 flex-1">
-						{/* Checkbox */}
-						<Checkbox
-							checked={isCompleted}
-							onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
-							className="mt-1"
-						/>
-
-						{/* Content */}
-						<div className="flex-1 space-y-5">
-							{/* Markdown content */}
-							<div className={isCompleted ? 'line-through opacity-60' : ''}>
-								<MDEditor.Markdown
-									source={markdownContent}
-									style={{
-										backgroundColor: 'transparent',
-										color: isCompleted ? '#a1a1aa' : '#e4e4e7',
-										fontSize: 14,
-										lineHeight: 1.6,
-									}}
+					return (
+						<div
+							key={todo.id}
+							className='flex items-start justify-between rounded-xl border border-zinc-700 cursor-pointer bg-zinc-800/50 p-4 shadow-sm hover:border-zinc-600 transition-colors'>
+							{/* Left side */}
+							<div className='flex gap-3 flex-1'>
+								{/* Checkbox */}
+								<Checkbox
+									checked={isCompleted}
+									onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
+									className='mt-1'
 								/>
+
+								{/* Content */}
+								<div className='flex-1 space-y-5'>
+									{/* Markdown content */}
+									<div className={isCompleted ? 'line-through opacity-60' : ''}>
+										<MDEditor.Markdown
+											source={markdownContent}
+											style={{
+												backgroundColor: 'transparent',
+												color: isCompleted ? '#a1a1aa' : '#e4e4e7',
+												fontSize: 14,
+												lineHeight: 1.6,
+											}}
+										/>
+									</div>
+
+									{/* Metadata badges */}
+									<div className='flex flex-wrap gap-2'>
+										{/* Created */}
+										<Badge variant='secondary' className='bg-zinc-700/50 text-zinc-300'>
+											Created: {new Date(todo.createdAt as string).toLocaleDateString()}
+										</Badge>
+
+										{/* Due Date */}
+										{todo.dueDate && (
+											<Badge variant='secondary' className='bg-amber-500/20 text-amber-300'>
+												Due: {new Date(todo.dueDate).toLocaleDateString()}
+											</Badge>
+										)}
+
+										{/* Priority */}
+										{todo.priority && (
+											<Badge variant='secondary' className={`${getPriorityColor(todo.priority)} bg-zinc-700/40`}>
+												{todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+											</Badge>
+										)}
+
+										{/* Category */}
+										{category && (
+											<Badge variant='secondary' className='bg-zinc-700/50 text-zinc-300 flex items-center gap-1'>
+												<div
+													className='w-2 h-2 rounded-full border border-zinc-600'
+													style={{ backgroundColor: category.color }}
+												/>
+												{category.name}
+											</Badge>
+										)}
+
+										{/* Status */}
+										<Badge
+											variant='secondary'
+											className={`${
+												!isCompleted ? 'bg-amber-500/20 text-amber-400' : 'bg-green-500/20 text-green-400'
+											}`}>
+											{!isCompleted ? 'Pending' : 'Completed'}
+										</Badge>
+									</div>
+								</div>
 							</div>
 
-							{/* Metadata badges */}
-							<div className="flex flex-wrap gap-2">
-								{/* Created */}
-								<Badge variant="secondary" className="bg-zinc-700/50 text-zinc-300">
-									Created: {new Date(todo.createdAt as string).toLocaleDateString()}
-								</Badge>
-
-								{/* Due Date */}
-								{todo.dueDate && (
-									<Badge variant="secondary" className="bg-amber-500/20 text-amber-300">
-										Due: {new Date(todo.dueDate).toLocaleDateString()}
-									</Badge>
-								)}
-
-								{/* Priority */}
-								{todo.priority && (
-									<Badge
-										variant="secondary"
-										className={`${getPriorityColor(todo.priority)} bg-zinc-700/40`}>
-										{todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-									</Badge>
-								)}
-
-								{/* Category */}
-								{category && (
-									<Badge
-										variant="secondary"
-										className="bg-zinc-700/50 text-zinc-300 flex items-center gap-1">
-										<div
-											className="w-2 h-2 rounded-full border border-zinc-600"
-											style={{ backgroundColor: category.color }}
-										/>
-										{category.name}
-									</Badge>
-								)}
-
-								{/* Status */}
-								<Badge
-									variant="secondary"
-									className={`${
-										!isCompleted ? 'bg-amber-500/20 text-amber-400' : 'bg-green-500/20 text-green-400'
-									}`}>
-									{!isCompleted ? 'Pending' : 'Completed'}
-								</Badge>
+							{/* Actions */}
+							<div className='flex flex-col gap-2 ml-4'>
+								<Button
+									onClick={() => handleEditClick(todo)}
+									size='sm'
+									variant='outline'
+									className='bg-zinc-700/60 hover:bg-zinc-600 text-zinc-200 border-zinc-600'>
+									<PenBox /> Edit
+								</Button>
+								<Button
+									onClick={() => handleDeleteClick(todo)}
+									size='sm'
+									variant='destructive'
+									className='hover:bg-red-700'>
+									<Trash /> Delete
+								</Button>
 							</div>
 						</div>
-					</div>
+					);
+				})}
+			{/* pagination buttons */}
+				<div className='flex justify-center gap-2 mt-4'>
+					<Button size='sm' onClick={goToFirstPage} disabled={currentPage === 1}>
+						First
+					</Button>
+					<Button size='sm' onClick={goToPreviousPage} disabled={currentPage === 1}>
+						Prev
+					</Button>
 
-					{/* Actions */}
-					<div className="flex flex-col gap-2 ml-4">
+					{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
 						<Button
-							onClick={() => handleEditClick(todo)}
-							size="sm"
-							variant="outline"
-							className="bg-zinc-700/60 hover:bg-zinc-600 text-zinc-200 border-zinc-600">
-							<PenBox/> Edit
+							key={page}
+							size='sm'
+							variant={page === currentPage ? 'secondary' : 'default'}
+							onClick={() => goToSpecificPage(page)}>
+							{page}
 						</Button>
-						<Button
-							onClick={() => handleDeleteClick(todo)}
-							size="sm"
-							variant="destructive"
-							className="hover:bg-red-700">
-							<Trash/> Delete
-						</Button>
-					</div>
+					))}
+
+					<Button size='sm' onClick={goToNextPage} disabled={currentPage === totalPages}>
+						Next
+					</Button>
+					<Button size='sm' onClick={goToLastPage} disabled={currentPage === totalPages}>
+						Last
+					</Button>
 				</div>
-			);
-		})}
+				{/* Delete Modal */}
+				{isModalOpen && selectedTodo && (
+					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+						<DeleteModal
+							open={isModalOpen}
+							onClose={() => setIsModalOpen(false)}
+							onConfirm={handleDeleteConfirm}
+							itemName={selectedTodo?.title}
+						/>
+					</div>
+				)}
 
-		{/* Delete Modal */}
-		{isModalOpen && selectedTodo && (
-			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-				<DeleteModal
-					open={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
-					onConfirm={handleDeleteConfirm}
-					itemName={selectedTodo?.title}
-				/>
+				{/* Edit Modal */}
+				{isEditModalOpen && editingTodo && (
+					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+						<EditModal
+							open={isEditModalOpen}
+							onClose={() => setIsEditModalOpen(false)}
+							todo={editingTodo}
+							onConfirm={handleEditConfirm}
+						/>
+					</div>
+				)}
 			</div>
-		)}
-
-		{/* Edit Modal */}
-		{isEditModalOpen && editingTodo && (
-			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-				<EditModal
-					open={isEditModalOpen}
-					onClose={() => setIsEditModalOpen(false)}
-					todo={editingTodo}
-					onConfirm={handleEditConfirm}
-				/>
-			</div>
-		)}
-	</div>
-</ScrollArea>
-
+		</ScrollArea>
 	);
 };
 
