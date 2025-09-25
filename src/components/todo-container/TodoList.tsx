@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
 import EditModal from '../edit-modal/EditModal';
+import PaginationButtons from '../pagination-buttons/PaginationButtons';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -27,7 +28,7 @@ const TodoList = () => {
 
 	// getting todos and categories using rtk query hooks
 	const { data: todosData } = useGetTodosQuery({ userId });
-	const { data: categoriesData } = useGetCategoriesQuery(); // Get all categories to map names
+	const { data: categoriesData } = useGetCategoriesQuery();
 	const [updateTodo] = useUpdateTodoMutation();
 	const [deleteTodo] = useDeleteTodoMutation();
 
@@ -128,7 +129,6 @@ const TodoList = () => {
 				{currentItems.map((todo: TodoType) => {
 					const isCompleted = todo.completed === true;
 					const category = getCategoryById(todo.category, categoriesData!);
-
 					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
 
 					return (
@@ -224,31 +224,15 @@ const TodoList = () => {
 					);
 				})}
 				{/* pagination buttons */}
-				<div className='flex justify-center gap-2 mt-4'>
-					<Button size='sm' onClick={goToFirstPage} disabled={currentPage === 1}>
-						First
-					</Button>
-					<Button size='sm' onClick={goToPreviousPage} disabled={currentPage === 1}>
-						Prev
-					</Button>
-
-					{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-						<Button
-							key={page}
-							size='sm'
-							variant={page === currentPage ? 'secondary' : 'default'}
-							onClick={() => goToSpecificPage(page)}>
-							{page}
-						</Button>
-					))}
-
-					<Button size='sm' onClick={goToNextPage} disabled={currentPage === totalPages}>
-						Next
-					</Button>
-					<Button size='sm' onClick={goToLastPage} disabled={currentPage === totalPages}>
-						Last
-					</Button>
-				</div>
+				<PaginationButtons
+					goToFirstPage={goToFirstPage}
+					currentPage={currentPage}
+					goToPreviousPage={goToPreviousPage}
+					totalPages={totalPages}
+					goToSpecificPage={goToSpecificPage}
+					goToNextPage={goToNextPage}
+					goToLastPage={goToLastPage}
+				/>
 				{/* Delete Modal */}
 				{isModalOpen && selectedTodo && (
 					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
