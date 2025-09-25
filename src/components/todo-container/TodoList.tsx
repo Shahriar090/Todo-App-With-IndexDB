@@ -7,7 +7,7 @@ import {
 	useUpdateTodoMutation,
 } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import type { TodoType } from '@/types/types';
+import type { TodoType } from '@/types';
 import { getCategoryById } from '@/utils/getCategoryById';
 import { getPriorityColor } from '@/utils/getPriorityColor';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';

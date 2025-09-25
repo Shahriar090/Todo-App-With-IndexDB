@@ -3,7 +3,7 @@ import { todoSchema, type TodoFormInputs } from '@/config/todo/todoValidationSch
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import { useAddCategoryMutation, useCreateTodoMutation, useGetCategoriesQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import type { CategoryType, PriorityType } from '@/types/types';
+import type { CategoryType, PriorityType } from '@/types';
 import { extractDescriptionFromMarkdown } from '@/utils/markdown-utils/extractDescription';
 import { extractTitleFromMarkdownContent } from '@/utils/markdown-utils/extractTitle';
 import { zodResolver } from '@hookform/resolvers/zod';
