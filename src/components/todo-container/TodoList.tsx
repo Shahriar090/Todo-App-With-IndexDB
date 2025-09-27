@@ -1,4 +1,5 @@
 import { usePagination } from '@/hooks/usePagination';
+import { useSearch } from '@/hooks/useSearch';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import {
 	useDeleteTodoMutation,
@@ -23,7 +24,7 @@ import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { ScrollArea } from '../ui/scroll-area';
 
-const TodoList = () => {
+const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 	const userId = useAppSelector(currentSelectedUserId);
 
 	// getting todos and categories using rtk query hooks
@@ -101,7 +102,12 @@ const TodoList = () => {
 	};
 
 	// pagination related logic starts
-	const todos = todosData?.todos || [];
+	const filteredTodosAfterSearch = useSearch(todosData?.todos || [], searchQuery, [
+		'title',
+		'description',
+		'priority',
+		'category',
+	]);
 
 	const {
 		currentPage,
@@ -112,13 +118,13 @@ const TodoList = () => {
 		goToPreviousPage,
 		goToFirstPage,
 		goToLastPage,
-	} = usePagination({ items: todos, itemsPerPage: 2 });
+	} = usePagination({ items: filteredTodosAfterSearch, itemsPerPage: 2 });
 
 	return (
 		<ScrollArea className='h-[500px] rounded-lg border border-zinc-800 bg-zinc-900 p-4'>
 			<div className='space-y-4'>
 				{/* Empty state */}
-				{todosData?.todos?.length === 0 && (
+				{filteredTodosAfterSearch.length === 0 && (
 					<div className='text-center text-zinc-400 py-12 rounded-lg border border-dashed border-zinc-700'>
 						<p className='text-sm font-medium'>No todos found</p>
 						<p className='text-xs mt-1 text-zinc-500'>Start by creating your first todo!</p>

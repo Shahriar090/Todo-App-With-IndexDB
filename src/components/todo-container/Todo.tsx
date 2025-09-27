@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import UserProfile from '../user-profile/UserProfile';
 import AddTodo from './AddTodo';
@@ -6,6 +7,8 @@ import Search from './Search';
 import TodoList from './TodoList';
 
 const Todo = () => {
+	// search related state
+	const [searchQuery, setSearchQuery] = useState<string>('');
 	return (
 		<section className='w-full h-screen bg-zinc-800 flex items-center justify-center'>
 			<div className='todo-container w-full max-w-7xl border border-zinc-700 rounded-md shadow p-5'>
@@ -16,7 +19,7 @@ const Todo = () => {
 					</div>
 					{/* select and filter */}
 					<div className='flex items-center gap-4 text-zinc-200'>
-						<Search />
+						<Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 						<FilterTodo />
 						{/* user profile section */}
 						<UserProfile />
@@ -35,7 +38,7 @@ const Todo = () => {
 						</CardHeader>
 
 						<CardContent className=''>
-							<TodoList />
+							<TodoList searchQuery={searchQuery} />
 						</CardContent>
 					</Card>
 
