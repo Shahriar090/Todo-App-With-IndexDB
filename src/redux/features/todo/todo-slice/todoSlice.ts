@@ -1,4 +1,4 @@
-import type { TodoType } from '@/types/types';
+import type { TodoType } from '@/types';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 type TodoState = {
