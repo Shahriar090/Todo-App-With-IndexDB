@@ -13,7 +13,7 @@ import { getCategoryById } from '@/utils/getCategoryById';
 import { getPriorityColor } from '@/utils/getPriorityColor';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
 import MDEditor from '@uiw/react-md-editor';
-import { PenBox, Trash } from 'lucide-react';
+import { Eye, EyeClosed, PenBox, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import DeleteModal from '../delete-modal/DeleteModal';
@@ -40,6 +40,9 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 	// states for update
 	const [editingTodo, setEditingTodo] = useState<TodoType | null>(null);
 	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+	// state for expand todo
+	const [expandedTodoId, setExpandedTodoId] = useState<string | null>(null);
 
 	// edit todo related logic starts
 	const handleEditClick = (todo: TodoType) => {
@@ -101,6 +104,15 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 		}
 	};
 
+	// expand toggle function
+	const expandTodoToggle = (id: string) => {
+		if (expandedTodoId === id) {
+			setExpandedTodoId(null); // close if already expanded
+		} else {
+			setExpandedTodoId(id); // otherwise expand the todo
+		}
+	};
+
 	// pagination related logic starts
 	const filteredTodosAfterSearch = useSearch(todosData?.todos || [], searchQuery, [
 		'title',
@@ -135,7 +147,10 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 				{currentItems.map((todo: TodoType) => {
 					const isCompleted = todo.completed === true;
 					const category = getCategoryById(todo.category, categoriesData!);
-					const markdownContent = createMarkdownContent(todo?.title || '', todo?.description || '');
+					// expanded content
+					const isExpanded = expandedTodoId === todo?.id;
+					const markdownTodoContent = createMarkdownContent(todo?.title || '', todo?.description || '');
+					const previewContent = markdownTodoContent.split('\n').slice(0, 2).join('\n');
 
 					return (
 						<div
@@ -155,7 +170,7 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 									{/* Markdown content */}
 									<div className={isCompleted ? 'line-through opacity-60' : ''}>
 										<MDEditor.Markdown
-											source={markdownContent}
+											source={isExpanded ? markdownTodoContent : previewContent}
 											style={{
 												backgroundColor: 'transparent',
 												color: isCompleted ? '#a1a1aa' : '#e4e4e7',
@@ -211,13 +226,22 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 
 							{/* Actions */}
 							<div className='flex flex-col gap-2 ml-4'>
+								{/* expand todo toggle button */}
+								<Button
+									onClick={() => expandTodoToggle(todo.id)}
+									size='sm'
+									variant='default'
+									className='bg-zinc-700/60 hover:bg-zinc-600 text-zinc-200 border-zinc-600'>
+									{isExpanded ? <EyeClosed /> : <Eye />} {isExpanded ? 'Close' : 'View Full'}
+								</Button>
 								<Button
 									onClick={() => handleEditClick(todo)}
 									size='sm'
-									variant='outline'
+									variant='default'
 									className='bg-zinc-700/60 hover:bg-zinc-600 text-zinc-200 border-zinc-600'>
 									<PenBox /> Edit
 								</Button>
+
 								<Button
 									onClick={() => handleDeleteClick(todo)}
 									size='sm'
