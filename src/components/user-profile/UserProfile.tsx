@@ -52,7 +52,11 @@ const UserProfile = () => {
 	return (
 		<div className='flex items-center justify-end p-4'>
 			<Select defaultValue='' onValueChange={handleSelectValueChange}>
-				<SelectTrigger className='w-48 bg-zinc-800 border-zinc-700 text-zinc-200'>
+				<SelectTrigger
+					type='button'
+					role='combobox'
+					aria-label='Open user profile menu'
+					className='w-48 bg-zinc-800 border-zinc-700 text-zinc-200'>
 					<SelectValue placeholder={user.username} />
 					<Avatar className='w-6 h-6'>
 						<AvatarImage className='' src={user.avatarUrl ? user.avatarUrl : ''} />
@@ -60,14 +64,23 @@ const UserProfile = () => {
 					</Avatar>
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value='profile'>{user.username} - Profile</SelectItem>
-					<SelectItem value='settings'>Settings</SelectItem>
-					<SelectItem value='logout'>Logout</SelectItem>
+					<SelectItem aria-label='Show user profile related data' value='profile'>
+						{user.username} - Profile
+					</SelectItem>
+					<SelectItem aria-label='Accound settings' value='settings'>
+						Settings
+					</SelectItem>
+					<SelectItem aria-label='Logout button' value='logout'>
+						Logout
+					</SelectItem>
 				</SelectContent>
 			</Select>
 
 			{isModalOpen && (
-				<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+				<div
+					className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'
+					role='dialog'
+					aria-modal='true'>
 					<EditUserProfileModal user={user} closeModal={() => setIsModalOpen(false)} />
 				</div>
 			)}

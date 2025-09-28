@@ -164,6 +164,7 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 									checked={isCompleted}
 									onCheckedChange={() => handleTodoToggle(todo.id as string, isCompleted)}
 									className='mt-1'
+									aria-label='Toggle for todo completed and uncompleted'
 								/>
 
 								{/* Content */}
@@ -229,6 +230,7 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 							<div className='flex flex-col gap-2 ml-4'>
 								{/* expand todo toggle button */}
 								<Button
+									aria-label='View full and close todo'
 									onClick={() => expandTodoToggle(todo.id)}
 									size='sm'
 									variant='default'
@@ -236,6 +238,7 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 									{isExpanded ? <EyeClosed /> : <Eye />} {isExpanded ? 'Close' : 'View Full'}
 								</Button>
 								<Button
+									aria-label='Edit todo'
 									onClick={() => handleEditClick(todo)}
 									size='sm'
 									variant='default'
@@ -244,6 +247,7 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 								</Button>
 
 								<Button
+									aria-label='Delete todo'
 									onClick={() => handleDeleteClick(todo)}
 									size='sm'
 									variant='destructive'

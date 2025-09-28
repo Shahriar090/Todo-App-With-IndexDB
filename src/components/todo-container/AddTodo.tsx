@@ -202,17 +202,17 @@ const AddTodo = () => {
 									data-color-mode='dark'
 								/>
 							</div>
-							<p className='text-xs text-zinc-500'>
+							<p className='text-xs text-zinc-300'>
 								Tip: Start with # for the title, then add your description below with full markdown support
 							</p>
 						</div>
 						{/* Priority */}
 						<div className='space-y-1'>
-							<Label htmlFor='priority' className='text-sm'>
+							<Label htmlFor='priority' className='text-sm text-zinc-100'>
 								Priority
 							</Label>
 							<Select value={selectedPriority} onValueChange={(value) => setValue('priority', value as PriorityType)}>
-								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
+								<SelectTrigger aria-label='Todo priority' className='bg-zinc-800 border-zinc-600 w-full py-5'>
 									<SelectValue placeholder='Select priority' />
 								</SelectTrigger>
 								<SelectContent>
@@ -225,12 +225,14 @@ const AddTodo = () => {
 
 						{/* Category */}
 						<div className='space-y-1'>
-							<Label htmlFor='category' className='text-sm'>
+							<Label htmlFor='category' className='text-sm text-zinc-100'>
 								Category
 							</Label>
 							<Select value={selectedCategory} onValueChange={handleCategoryChange}>
-								<SelectTrigger className='bg-zinc-800 border-zinc-700 w-full py-5'>
-									<SelectValue placeholder='Select category' />
+								<SelectTrigger aria-label='Todo category' className='bg-zinc-800 border-zinc-600 w-full py-5'>
+									<span className='text-zinc-200'>
+										<SelectValue placeholder='Select category' />
+									</span>
 								</SelectTrigger>
 								<SelectContent>
 									{userSpecificCategories?.map((cat: CategoryType) => (
@@ -254,10 +256,10 @@ const AddTodo = () => {
 
 						{/* Due Date */}
 						<div className='space-y-1'>
-							<Label htmlFor='dueDate' className='text-sm'>
+							<Label htmlFor='dueDate' className='text-sm text-zinc-100'>
 								Due Date
 							</Label>
-							<Input type='date' id='dueDate' className='bg-zinc-800 border-zinc-700 py-5' {...register('dueDate')} />
+							<Input type='date' id='dueDate' className='bg-zinc-800 border-zinc-600 py-5' {...register('dueDate')} />
 							{errors.dueDate && <p className='text-red-500 text-sm'>{errors.dueDate.message}</p>}
 						</div>
 

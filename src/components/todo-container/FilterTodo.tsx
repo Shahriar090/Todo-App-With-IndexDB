@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const FilterTodo = () => {
 	return (
 		<Select>
-			<SelectTrigger className='w-32 bg-zinc-800 border-zinc-700'>
+			<SelectTrigger aria-label='Filter Todos' className='w-32 bg-zinc-800 border-zinc-700'>
 				<SelectValue placeholder='Filter' />
 			</SelectTrigger>
 			<SelectContent>

@@ -143,3 +143,11 @@
 	scrollbar-width: thin;
 	scrollbar-color: #18181b #27272a;
 }
+
+
+
+.w-md-editor-toolbar button {
+  min-width: 28px;   /* recommended min touch size */
+  min-height: 28px;
+  padding: 0px;      /* more breathing room */
+}
