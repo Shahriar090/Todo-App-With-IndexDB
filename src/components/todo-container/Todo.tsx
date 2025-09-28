@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import UserProfile from '../user-profile/UserProfile';
 import AddTodo from './AddTodo';
 import FilterTodo from './FilterTodo';
 import Search from './Search';
 import TodoList from './TodoList';
+const UserProfile = lazy(() => import('@/components/user-profile/UserProfile'));
 
 const Todo = () => {
 	// search related state
@@ -22,7 +22,9 @@ const Todo = () => {
 						<Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 						<FilterTodo />
 						{/* user profile section */}
-						<UserProfile />
+						<Suspense fallback={<span>Loading User Profile...</span>}>
+							<UserProfile />
+						</Suspense>
 					</div>
 				</div>
 
