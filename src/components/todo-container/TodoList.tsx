@@ -14,15 +14,16 @@ import { getPriorityColor } from '@/utils/getPriorityColor';
 import { createMarkdownContent } from '@/utils/markdown-utils/createMarkdownContent';
 import MDEditor from '@uiw/react-md-editor';
 import { Eye, EyeClosed, PenBox, Trash } from 'lucide-react';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { toast } from 'sonner';
-import DeleteModal from '../delete-modal/DeleteModal';
-import EditModal from '../edit-modal/EditModal';
 import PaginationButtons from '../pagination-buttons/PaginationButtons';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { ScrollArea } from '../ui/scroll-area';
+// import EditModal from '../edit-modal/EditModal';
+const EditModal = lazy(() => import('@/components/edit-modal/EditModal'));
+const DeleteModal = lazy(() => import('@/components/delete-modal/DeleteModal'));
 
 const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 	const userId = useAppSelector(currentSelectedUserId);
@@ -264,28 +265,31 @@ const TodoList = ({ searchQuery }: { searchQuery: string }) => {
 					goToLastPage={goToLastPage}
 				/>
 				{/* Delete Modal */}
-				{isModalOpen && selectedTodo && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-						<DeleteModal
-							open={isModalOpen}
-							onClose={() => setIsModalOpen(false)}
-							onConfirm={handleDeleteConfirm}
-							itemName={selectedTodo?.title}
-						/>
-					</div>
-				)}
-
+				<Suspense fallback={<span>Loading Delete Modal...</span>}>
+					{isModalOpen && selectedTodo && (
+						<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+							<DeleteModal
+								open={isModalOpen}
+								onClose={() => setIsModalOpen(false)}
+								onConfirm={handleDeleteConfirm}
+								itemName={selectedTodo?.title}
+							/>
+						</div>
+					)}
+				</Suspense>
 				{/* Edit Modal */}
-				{isEditModalOpen && editingTodo && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-						<EditModal
-							open={isEditModalOpen}
-							onClose={() => setIsEditModalOpen(false)}
-							todo={editingTodo}
-							onConfirm={handleEditConfirm}
-						/>
-					</div>
-				)}
+				<Suspense fallback={<span>Loading Edit Modal...</span>}>
+					{isEditModalOpen && editingTodo && (
+						<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+							<EditModal
+								open={isEditModalOpen}
+								onClose={() => setIsEditModalOpen(false)}
+								todo={editingTodo}
+								onConfirm={handleEditConfirm}
+							/>
+						</div>
+					)}
+				</Suspense>
 			</div>
 		</ScrollArea>
 	);
