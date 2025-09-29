@@ -57,7 +57,9 @@ const UserProfile = () => {
 					role='combobox'
 					aria-label='Open user profile menu'
 					className='w-48 bg-zinc-800 border-zinc-700 text-zinc-200'>
-					<SelectValue placeholder={user.username} />
+					<span className='text-zinc-200'>
+						<SelectValue placeholder={user.username} />
+					</span>
 					<Avatar className='w-6 h-6'>
 						<AvatarImage className='' src={user.avatarUrl ? user.avatarUrl : ''} />
 						<AvatarFallback>{user.firstName.slice(0, 1)}</AvatarFallback>

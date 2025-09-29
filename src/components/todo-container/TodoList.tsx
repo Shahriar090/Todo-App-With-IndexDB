@@ -18,7 +18,11 @@ const TodoList = ({
 	searchQuery,
 	currentItems,
 	filteredTodosAfterSearch,
-}:{searchQuery:string;currentItems:TodoType[];filteredTodosAfterSearch:TodoType[]}) => {
+}: {
+	searchQuery: string;
+	currentItems: TodoType[];
+	filteredTodosAfterSearch: TodoType[];
+}) => {
 	// getting categories using rtk query hooks
 	const { data: categoriesData } = useGetCategoriesQuery();
 	const [updateTodo] = useUpdateTodoMutation();

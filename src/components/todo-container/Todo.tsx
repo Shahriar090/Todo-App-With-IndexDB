@@ -43,8 +43,7 @@ const Todo = () => {
 		goToPreviousPage,
 		goToFirstPage,
 		goToLastPage,
-	} = usePagination({ items: filteredTodosAfterSearch, itemsPerPage: 2 });
-	console.log(currentItems, 'testing pagination');
+	} = usePagination({ items: filteredTodosAfterSearch, itemsPerPage: 4 });
 	return (
 		<>
 			{' '}

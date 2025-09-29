@@ -12,7 +12,7 @@ const Search = ({ searchQuery, setSearchQuery }: SearchQueryPropsTypes) => {
 			value={searchQuery}
 			onChange={(e) => setSearchQuery(e.target.value)}
 			placeholder='Search Todo...'
-			className='bg-zinc-800 border-zinc-700 w-48'
+			className='bg-zinc-800 border-zinc-700 w-48 placeholder:text-zinc-200'
 		/>
 	);
 };
