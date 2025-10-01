@@ -1,11 +1,11 @@
 import { logoutUser } from '@/redux/features/auth/auth-slice/authSlice';
-import { useGetUserProfileQuery } from '@/redux/features/auth/authApi';
+import { useLazyGetUserProfileQuery } from '@/redux/features/auth/authApi';
 import { useAppDispatch } from '@/redux/hooks';
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import EditUserProfileModal from '../edit-user-profile-modal/EditUserProfileModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+const EditUserProfileModal = lazy(() => import('@/components/edit-user-profile-modal/EditUserProfileModal'));
 
 const UserProfile = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -13,7 +13,12 @@ const UserProfile = () => {
 	// const user = useAppSelector(currentSelectedUser);
 
 	// getting current user from rtk queries's get user profile query
-	const { data, isLoading, isError } = useGetUserProfileQuery(undefined);
+	// const { data, isLoading, isError } = useGetUserProfileQuery(undefined);
+	const [fetchUerProfile, { data, isLoading, isError }] = useLazyGetUserProfileQuery();
+
+	useEffect(() => {
+		fetchUerProfile(undefined);
+	}, [fetchUerProfile]);
 	const user = data?.user;
 
 	const dispatch = useAppDispatch();
@@ -78,14 +83,16 @@ const UserProfile = () => {
 				</SelectContent>
 			</Select>
 
-			{isModalOpen && (
-				<div
-					className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'
-					role='dialog'
-					aria-modal='true'>
-					<EditUserProfileModal user={user} closeModal={() => setIsModalOpen(false)} />
-				</div>
-			)}
+			<Suspense fallback={<span>Loading...</span>}>
+				{isModalOpen && (
+					<div
+						className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'
+						role='dialog'
+						aria-modal='true'>
+						<EditUserProfileModal user={user} closeModal={() => setIsModalOpen(false)} />
+					</div>
+				)}
+			</Suspense>
 		</div>
 	);
 };

@@ -1,7 +1,11 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: ignored some biome warning from this entire file by the developer */
 import { todoSchema, type TodoFormInputs } from '@/config/todo/todoValidationSchema';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
-import { useAddCategoryMutation, useCreateTodoMutation, useGetCategoriesQuery } from '@/redux/features/todo/todo.api';
+import {
+	useAddCategoryMutation,
+	useCreateTodoMutation,
+	useLazyGetCategoriesQuery,
+} from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
 import type { CategoryType, PriorityType } from '@/types';
 import { extractDescriptionFromMarkdown } from '@/utils/markdown-utils/extractDescription';
@@ -9,7 +13,7 @@ import { extractTitleFromMarkdownContent } from '@/utils/markdown-utils/extractT
 import { zodResolver } from '@hookform/resolvers/zod';
 import MDEditor from '@uiw/react-md-editor';
 import { Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
@@ -23,14 +27,21 @@ type CategoryFormInputs = {
 	name: string;
 	color: string;
 };
-const AddTodoModal = ({ onClose }: { onClose: () => void }) => {
+const AddTodoModal = ({ onClose, isOpen }: { onClose: () => void; isOpen: boolean }) => {
 	const [createTodo, { isLoading, isError }] = useCreateTodoMutation();
 	const userId = useAppSelector(currentSelectedUserId);
-	const { data } = useGetCategoriesQuery();
+	// const { data } = useGetCategoriesQuery();
+	// lazy fetching categories only when needed
+	const [getCategories, { data }] = useLazyGetCategoriesQuery();
 	const [addCategory, { isLoading: isAddingCategory }] = useAddCategoryMutation();
 
+	useEffect(() => {
+		if (isOpen && !data) {
+			getCategories();
+		}
+	}, [isOpen, getCategories, data]);
 	// filtering categories to show user specific categories
-	const userSpecificCategories = data?.categories.filter((category) => category.userId === userId);
+	const userSpecificCategories = data?.categories?.filter((category) => category.userId === userId);
 
 	// Modal state
 	const [showCategoryModal, setShowCategoryModal] = useState(false);

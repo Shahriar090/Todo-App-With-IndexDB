@@ -11,4 +11,18 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
+	build: {
+		minify: true,
+		cssMinify: true,
+		chunkSizeWarningLimit: 1024,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					dexie: ['dexie', 'dexie-react-hooks'],
+					react: ['react-router', 'react', 'react-dom', 'react-hook-form', 'react-redux'],
+					markdown: ['@uiw/react-markdown-preview', '@uiw/react-md-editor'],
+				},
+			},
+		},
+	},
 });

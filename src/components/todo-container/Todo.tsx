@@ -3,15 +3,15 @@ import { useSearch } from '@/hooks/useSearch';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import { useGetTodosQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
-import { lazy, Suspense, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AddTodoModal from '../add-todo-modal/AddTodoModal';
 import PaginationButtons from '../pagination-buttons/PaginationButtons';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import UserProfile from '../user-profile/UserProfile';
 import FilterTodo from './FilterTodo';
 import Search from './Search';
 import TodoList from './TodoList';
-const UserProfile = lazy(() => import('@/components/user-profile/UserProfile'));
 
 const Todo = () => {
 	const userId = useAppSelector(currentSelectedUserId);
@@ -21,6 +21,17 @@ const Todo = () => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	// add modal
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+
+	// hiding user profile in initial loading to improve LCP performance, because this component is responsible
+	// to call an API which was increasing LCP duration significantly for home page as this component is rendering on the home page.
+	const [showUserProfile, setShowUserProfile] = useState<boolean>(false);
+
+	useEffect(() => {
+		const timerToShowUserProfile = setTimeout(() => setShowUserProfile(true), 5000);
+
+		// clear time out with cleanup
+		return () => clearTimeout(timerToShowUserProfile);
+	}, []);
 
 	const handleAddTodoModalToggle = () => {
 		setIsAddModalOpen((prev) => !prev);
@@ -59,9 +70,7 @@ const Todo = () => {
 							<Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 							<FilterTodo />
 							{/* user profile section */}
-							<Suspense fallback={<span>Loading User Profile...</span>}>
-								<UserProfile />
-							</Suspense>
+							{showUserProfile && <UserProfile />}
 						</div>
 					</div>
 
@@ -105,7 +114,7 @@ const Todo = () => {
 			</section>
 			{isAddModalOpen && (
 				<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-					<AddTodoModal onClose={handleAddTodoModalToggle} />
+					<AddTodoModal onClose={handleAddTodoModalToggle} isOpen={isAddModalOpen} />
 				</div>
 			)}
 		</>
