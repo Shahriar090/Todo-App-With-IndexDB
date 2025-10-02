@@ -1,3 +1,4 @@
+import SEO from '@/components/seo/SEO';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -78,58 +79,68 @@ const Register = () => {
 	};
 
 	return (
-		<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
-			<Card className='w-full max-w-lg mx-auto mt-10 shadow-xl rounded-2xl'>
-				<CardHeader>
-					<CardTitle className='text-xl'>Register</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-						{/* first name */}
-						<Label htmlFor='first-name'>First Name</Label>
-						<Input placeholder='Enter Your First Name' type='text' {...register('firstName', { required: true })} />
-						{errors.firstName && <p className='text-red-600 font-medium text-sm'>{errors.firstName.message}</p>}
+		<>
+			<SEO
+				title='Register'
+				description='Create your account on Lazy Todo to start tracking tasks, setting priorities and organizing categories.'
+			/>
+			<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
+				<Card className='w-full max-w-lg mx-auto mt-10 shadow-xl rounded-2xl'>
+					<CardHeader>
+						<CardTitle className='text-xl'>Register</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+							{/* first name */}
+							<Label htmlFor='first-name'>First Name</Label>
+							<Input placeholder='Enter Your First Name' type='text' {...register('firstName', { required: true })} />
+							{errors.firstName && <p className='text-red-600 font-medium text-sm'>{errors.firstName.message}</p>}
 
-						{/* last name */}
-						<Label htmlFor='last-name'>Last Name</Label>
-						<Input placeholder='Enter Your Last Name' type='text' {...register('lastName', { required: true })} />
-						{errors.lastName && <p className='text-red-600 font-medium text-sm'>{errors.lastName.message}</p>}
+							{/* last name */}
+							<Label htmlFor='last-name'>Last Name</Label>
+							<Input placeholder='Enter Your Last Name' type='text' {...register('lastName', { required: true })} />
+							{errors.lastName && <p className='text-red-600 font-medium text-sm'>{errors.lastName.message}</p>}
 
-						{/* user name */}
-						<Label htmlFor='user-name'>User Name</Label>
-						<Input placeholder='Enter User Name (ironman)' type='text' {...register('username', { required: true })} />
-						{errors.username && <p className='text-red-600 font-medium text-sm'>{errors.username.message}</p>}
+							{/* user name */}
+							<Label htmlFor='user-name'>User Name</Label>
+							<Input
+								placeholder='Enter User Name (ironman)'
+								type='text'
+								{...register('username', { required: true })}
+							/>
+							{errors.username && <p className='text-red-600 font-medium text-sm'>{errors.username.message}</p>}
 
-						{/* email */}
-						<Label htmlFor='email'>Email</Label>
-						<Input placeholder='Enter Your Email' type='email' {...register('email', { required: true })} />
-						{errors.email && <p className='text-red-600 font-medium text-sm'>{errors.email.message}</p>}
+							{/* email */}
+							<Label htmlFor='email'>Email</Label>
+							<Input placeholder='Enter Your Email' type='email' {...register('email', { required: true })} />
+							{errors.email && <p className='text-red-600 font-medium text-sm'>{errors.email.message}</p>}
 
-						{/* password */}
-						<Label htmlFor='password'>Password</Label>
-						<Input placeholder='Enter Your Password' type='password' {...register('password', { required: true })} />
-						{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>}
+							{/* password */}
+							<Label htmlFor='password'>Password</Label>
+							<Input placeholder='Enter Your Password' type='password' {...register('password', { required: true })} />
+							{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>}
 
-						{/* submit button */}
-						<Button type='submit' className='w-full'>
-							{isLoading ? 'Registering...' : 'Register'}
-						</Button>
-					</form>
-					{/* handling error */}
-					{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to register..!</p>}
+							{/* submit button */}
+							<Button type='submit' className='w-full'>
+								{isLoading ? 'Registering...' : 'Register'}
+							</Button>
+						</form>
+						{/* handling error */}
+						{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to register..!</p>}
 
-					<div className='pt-5'>
-						<p className='text-xs'>
-							Already have an account?{' '}
-							<Link to='/login' className='font-semibold'>
-								Login
-							</Link>
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-			;
-		</section>
+						<div className='pt-5'>
+							<p className='text-xs'>
+								Already have an account?{' '}
+								<Link to='/login' className='font-semibold'>
+									Login
+								</Link>
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+				;
+			</section>
+		</>
 	);
 };
 

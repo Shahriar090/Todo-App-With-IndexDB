@@ -6,6 +6,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { useEffect, useState } from 'react';
 import AddTodoModal from '../add-todo-modal/AddTodoModal';
 import PaginationButtons from '../pagination-buttons/PaginationButtons';
+import SEO from '../seo/SEO';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import UserProfile from '../user-profile/UserProfile';
@@ -57,7 +58,7 @@ const Todo = () => {
 	} = usePagination({ items: filteredTodosAfterSearch, itemsPerPage: 4 });
 	return (
 		<>
-			{' '}
+			<SEO title='Your Todos' description='View, create, and manage your todos with categories and priorities.' />{' '}
 			<section className='w-full h-screen bg-zinc-800 flex items-center justify-center'>
 				<div className='todo-container w-full max-w-7xl border border-zinc-700 rounded-md shadow p-5'>
 					{/* Header */}

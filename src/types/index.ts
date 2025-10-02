@@ -21,5 +21,8 @@ export * from './api-types/todoResponseType';
 // pagination
 export * from './pagination-types/paginationButtonsComponentTypes';
 
+// seo
+export * from './seo-types/seoTypes';
+
 // error
 export * from './erro-type/errorType';
