@@ -1,6 +1,7 @@
 import { setAuth } from '@/redux/features/auth/auth-slice/authSlice';
 import { useUpdateUserProfileMutation } from '@/redux/features/auth/authApi';
 import { useAppDispatch } from '@/redux/hooks';
+import type { EditUserProfileModalProps, EditUserProfileType, ErrorType } from '@/types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
@@ -8,22 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
-type EditUserProfileType = {
-	id?: string;
-	firstName?: string;
-	lastName?: string;
-	username?: string;
-	email?: string;
-	password?: string;
-	avatarUrl?: string;
-	createdAt?: string;
-	updatedAt?: string;
-};
-
-type EditUserProfileModalProps = {
-	user: EditUserProfileType;
-	closeModal: () => void;
-};
 
 const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) => {
 	console.log(user, 'from edit user modal');
@@ -35,7 +20,7 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 		defaultValues: user,
 	});
 
-	const [updateUserProfile, { isLoading, isError }] = useUpdateUserProfileMutation();
+	const [updateUserProfile, { isLoading, isError}] = useUpdateUserProfileMutation();
 	const dispatch = useAppDispatch();
 
 	// submit handler
@@ -53,8 +38,8 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 				}),
 			);
 			closeModal();
-		} catch (error) {
-			toast.error('Failed to update profile');
+		} catch (error:unknown) {
+			toast.error((error as ErrorType).error ||'Failed to update profile');
 			console.error(error);
 		}
 	};
@@ -86,9 +71,9 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 					{errors.email && <p className='text-red-600 font-medium text-sm'>{errors.email.message}</p>}
 
 					{/* password */}
-					<Label htmlFor='password'>Password</Label>
+					{/* <Label htmlFor='password'>Password</Label>
 					<Input placeholder='Enter Your Password' type='password' {...register('password', { required: true })} />
-					{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>}
+					{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>} */}
 
 					{/* submit button */}
 					<div className='flex flex-col items-center gap-2'>
@@ -101,7 +86,7 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 						</Button>
 					</div>
 				</form>
-				{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to register..!</p>}
+				{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to update user info..!</p>}
 			</CardContent>
 		</Card>
 	);

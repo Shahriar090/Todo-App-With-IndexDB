@@ -5,6 +5,7 @@ export * from './context-types/todoContextType';
 // components
 export * from './component-types/deleteModalType';
 export * from './component-types/editModalTypes';
+export * from './component-types/editUserProfileType';
 
 // models
 export * from './model-types/categoryType';
