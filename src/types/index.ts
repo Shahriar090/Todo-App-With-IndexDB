@@ -7,6 +7,9 @@ export * from './component-types/deleteModalType';
 export * from './component-types/editModalTypes';
 export * from './component-types/editUserProfileType';
 
+// hooks
+export * from './hook-types/useFilterHookType';
+
 // models
 export * from './model-types/categoryType';
 export * from './model-types/decryptedType';
