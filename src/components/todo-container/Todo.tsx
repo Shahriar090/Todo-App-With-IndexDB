@@ -1,3 +1,4 @@
+import { useFilter } from '@/hooks/useFilter';
 import { usePagination } from '@/hooks/usePagination';
 import { useSearch } from '@/hooks/useSearch';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
@@ -23,6 +24,10 @@ const Todo = () => {
 	// add modal
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
+	// filtering related states
+	const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'low' | 'medium' | 'high'>('all');
+	const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'thisWeek' | 'thisMonth'>('all');
+
 	// hiding user profile in initial loading to improve LCP performance, because this component is responsible
 	// to call an API which was increasing LCP duration significantly for home page as this component is rendering on the home page.
 	const [showUserProfile, setShowUserProfile] = useState<boolean>(false);
@@ -38,8 +43,10 @@ const Todo = () => {
 		setIsAddModalOpen((prev) => !prev);
 	};
 
+	// apply filtering before search and pagination
+	const filteredTodos = useFilter(todosData?.todos || [], { status: statusFilter, date: dateFilter });
 	// pagination related logic starts
-	const filteredTodosAfterSearch = useSearch(todosData?.todos || [], searchQuery, [
+	const filteredTodosAfterSearch = useSearch(filteredTodos, searchQuery, [
 		'title',
 		'description',
 		'priority',
@@ -69,7 +76,12 @@ const Todo = () => {
 						{/* select and filter */}
 						<div className='flex items-center gap-4 text-zinc-200'>
 							<Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-							<FilterTodo />
+							<FilterTodo
+								statusFilter={statusFilter}
+								setStatusFilter={setStatusFilter}
+								dateFilter={dateFilter}
+								setDateFilter={setDateFilter}
+							/>
 							{/* user profile section */}
 							{showUserProfile && <UserProfile />}
 						</div>

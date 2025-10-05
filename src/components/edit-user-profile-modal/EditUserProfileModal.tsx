@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
-
 const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) => {
 	console.log(user, 'from edit user modal');
 	const {
@@ -20,7 +19,7 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 		defaultValues: user,
 	});
 
-	const [updateUserProfile, { isLoading, isError}] = useUpdateUserProfileMutation();
+	const [updateUserProfile, { isLoading, isError }] = useUpdateUserProfileMutation();
 	const dispatch = useAppDispatch();
 
 	// submit handler
@@ -38,8 +37,8 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 				}),
 			);
 			closeModal();
-		} catch (error:unknown) {
-			toast.error((error as ErrorType).error ||'Failed to update profile');
+		} catch (error: unknown) {
+			toast.error((error as ErrorType).error || 'Failed to update profile');
 			console.error(error);
 		}
 	};
@@ -86,7 +85,9 @@ const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) =
 						</Button>
 					</div>
 				</form>
-				{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to update user info..!</p>}
+				{isError && (
+					<p className='text-red-600 text-sm mt-2'>Something went wrong while trying to update user info..!</p>
+				)}
 			</CardContent>
 		</Card>
 	);
