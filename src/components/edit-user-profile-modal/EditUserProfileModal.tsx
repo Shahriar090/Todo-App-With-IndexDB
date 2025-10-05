@@ -26,6 +26,7 @@ type EditUserProfileModalProps = {
 };
 
 const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) => {
+	console.log(user, 'from edit user modal');
 	const {
 		register,
 		handleSubmit,

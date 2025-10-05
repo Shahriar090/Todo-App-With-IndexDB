@@ -9,6 +9,7 @@ const EditUserProfileModal = lazy(() => import('@/components/edit-user-profile-m
 
 const UserProfile = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [selectValue, setSelectValue] = useState<string>('');
 	// const { user, logout } = useAuth();
 	// const user = useAppSelector(currentSelectedUser);
 
@@ -37,6 +38,7 @@ const UserProfile = () => {
 	};
 
 	const handleSelectValueChange = (value: string) => {
+		setSelectValue(value);
 		switch (value) {
 			case 'profile':
 				setIsModalOpen(true);
@@ -49,6 +51,7 @@ const UserProfile = () => {
 				handleLogOut();
 				break;
 		}
+		setSelectValue('');
 	};
 
 	if (isLoading) return <span>Loading profile...</span>;
@@ -56,7 +59,7 @@ const UserProfile = () => {
 
 	return (
 		<div className='flex items-center justify-end p-4'>
-			<Select defaultValue='' onValueChange={handleSelectValueChange}>
+			<Select value={selectValue} onValueChange={handleSelectValueChange}>
 				<SelectTrigger
 					type='button'
 					role='combobox'
