@@ -5,9 +5,9 @@ import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlic
 import { useGetTodosQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
 import type { FilterOptionsType } from '@/types';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import AddTodoModal from '../add-todo-modal/AddTodoModal';
-import PaginationButtons from '../pagination-buttons/PaginationButtons';
+// import PaginationButtons from '../pagination-buttons/PaginationButtons';
 import SEO from '../seo/SEO';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -15,6 +15,7 @@ import UserProfile from '../user-profile/UserProfile';
 import FilterTodo from './FilterTodo';
 import Search from './Search';
 import TodoList from './TodoList';
+const PaginationButtons = lazy(() => import('@/components/pagination-buttons/PaginationButtons'));
 
 const Todo = () => {
 	const userId = useAppSelector(currentSelectedUserId);
@@ -32,12 +33,20 @@ const Todo = () => {
 	// hiding user profile in initial loading to improve LCP performance, because this component is responsible
 	// to call an API which was increasing LCP duration significantly for home page as this component is rendering on the home page.
 	const [showUserProfile, setShowUserProfile] = useState<boolean>(false);
+	const [showPaginationButtons, setShowPaginationButtons] = useState<boolean>(false);
 
 	useEffect(() => {
 		const timerToShowUserProfile = setTimeout(() => setShowUserProfile(true), 5000);
 
 		// clear time out with cleanup
 		return () => clearTimeout(timerToShowUserProfile);
+	}, []);
+
+	// use effect to delay render pagination buttons
+	useEffect(() => {
+		const timerToShowPaginationButtons = setTimeout(() => setShowPaginationButtons(true), 2000);
+
+		return () => clearTimeout(timerToShowPaginationButtons);
 	}, []);
 
 	const handleAddTodoModalToggle = () => {
@@ -115,15 +124,19 @@ const Todo = () => {
 						{/* <AddTodo /> */}
 					</div>
 					{/* pagination buttons */}
-					<PaginationButtons
-						goToFirstPage={goToFirstPage}
-						currentPage={currentPage}
-						goToPreviousPage={goToPreviousPage}
-						totalPages={totalPages}
-						goToSpecificPage={goToSpecificPage}
-						goToNextPage={goToNextPage}
-						goToLastPage={goToLastPage}
-					/>
+					{showPaginationButtons && (
+						<Suspense fallback={<span>Loading Pagination Buttons...</span>}>
+							<PaginationButtons
+								goToFirstPage={goToFirstPage}
+								currentPage={currentPage}
+								goToPreviousPage={goToPreviousPage}
+								totalPages={totalPages}
+								goToSpecificPage={goToSpecificPage}
+								goToNextPage={goToNextPage}
+								goToLastPage={goToLastPage}
+							/>
+						</Suspense>
+					)}
 				</div>
 			</section>
 			{isAddModalOpen && (
