@@ -1,7 +1,20 @@
 import { Input } from '../ui/input';
 
-const Search = () => {
-	return <Input placeholder='Search Todo...' className='bg-zinc-800 border-zinc-700 w-48' />;
+type SearchQueryPropsTypes = {
+	searchQuery: string;
+	setSearchQuery: (val: string) => void;
+};
+
+const Search = ({ searchQuery, setSearchQuery }: SearchQueryPropsTypes) => {
+	return (
+		<Input
+			type='text'
+			value={searchQuery}
+			onChange={(e) => setSearchQuery(e.target.value)}
+			placeholder='Search Todo...'
+			className='bg-zinc-800 border-zinc-700 w-48 placeholder:text-zinc-200'
+		/>
+	);
 };
 
 export default Search;

@@ -44,11 +44,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// after add, it will return an id
 		const newUserId = await db.users.add(userInfo);
-		console.log(newUserId, 'New user from auth provider');
 
 		// here it will give the entire user object
 		const newlyCreatedUser = await db.users.get(newUserId);
-		console.log(newlyCreatedUser, 'New user after created from auth provider');
 
 		if (!newlyCreatedUser) {
 			throw new Error('Failed To Create New User');
@@ -73,7 +71,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		const userArray = await db.users.where('email').equals(normalizedEmail).toArray();
 		const existingUser = userArray[0];
 
-		console.log(existingUser, 'Existing user from provider');
 		if (!existingUser) {
 			throw new Error('No User Found.!');
 		}

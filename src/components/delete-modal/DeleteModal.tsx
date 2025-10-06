@@ -1,4 +1,4 @@
-import type { DeleteModalProps } from '@/types/types';
+import type { DeleteModalProps } from '@/types';
 import {
 	AlertDialog,
 	AlertDialogAction,
