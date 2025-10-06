@@ -11,4 +11,31 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
+	build: {
+		minify: true,
+		cssMinify: true,
+		chunkSizeWarningLimit: 1024,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					dexie: ['dexie', 'dexie-react-hooks'],
+					react: ['react-router', 'react', 'react-dom', 'react-hook-form', 'react-redux'],
+					markdown: ['@uiw/react-markdown-preview', '@uiw/react-md-editor'],
+					validation: ['zod', '@hookform/resolvers'],
+					ui: [
+						'@radix-ui/react-alert-dialog',
+						'@radix-ui/react-avatar',
+						'@radix-ui/react-checkbox',
+						'@radix-ui/react-dropdown-menu',
+						'@radix-ui/react-label',
+						'@radix-ui/react-scroll-area',
+						'@radix-ui/react-select',
+						'@radix-ui/react-slot',
+						'sonner',
+						'lucide-react',
+					],
+				},
+			},
+		},
+	},
 });

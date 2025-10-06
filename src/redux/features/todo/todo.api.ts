@@ -101,4 +101,5 @@ export const {
 	useDeleteTodoMutation,
 	useAddCategoryMutation,
 	useGetCategoriesQuery,
+	useLazyGetCategoriesQuery,
 } = todoApi;

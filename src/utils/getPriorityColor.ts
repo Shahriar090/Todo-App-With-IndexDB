@@ -2,12 +2,12 @@
 export const getPriorityColor = (priority: string) => {
 	switch (priority?.toLowerCase()) {
 		case 'high':
-			return 'text-red-400';
+			return 'text-red-900';
 		case 'medium':
-			return 'text-yellow-400';
+			return 'text-yellow-900';
 		case 'low':
-			return 'text-green-400';
+			return 'text-green-900';
 		default:
-			return 'text-zinc-400';
+			return 'text-zinc-600';
 	}
 };
