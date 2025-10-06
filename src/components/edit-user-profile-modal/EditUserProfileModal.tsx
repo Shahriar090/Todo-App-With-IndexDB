@@ -10,7 +10,6 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
 const EditUserProfileModal = ({ user, closeModal }: EditUserProfileModalProps) => {
-	console.log(user, 'from edit user modal');
 	const {
 		register,
 		handleSubmit,
