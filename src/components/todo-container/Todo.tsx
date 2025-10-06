@@ -4,6 +4,7 @@ import { useSearch } from '@/hooks/useSearch';
 import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
 import { useGetTodosQuery } from '@/redux/features/todo/todo.api';
 import { useAppSelector } from '@/redux/hooks';
+import type { FilterOptionsType } from '@/types';
 import { useEffect, useState } from 'react';
 import AddTodoModal from '../add-todo-modal/AddTodoModal';
 import PaginationButtons from '../pagination-buttons/PaginationButtons';
@@ -25,8 +26,8 @@ const Todo = () => {
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
 	// filtering related states
-	const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'low' | 'medium' | 'high'>('all');
-	const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'thisWeek' | 'thisMonth'>('all');
+	const [statusFilter, setStatusFilter] = useState<FilterOptionsType['status']>('all');
+	const [dateFilter, setDateFilter] = useState<FilterOptionsType['date']>('all');
 
 	// hiding user profile in initial loading to improve LCP performance, because this component is responsible
 	// to call an API which was increasing LCP duration significantly for home page as this component is rendering on the home page.
