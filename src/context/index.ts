@@ -1,4 +1,4 @@
-import type { AuthContextType, TodoContextType } from '@/types/types';
+import type { AuthContextType, TodoContextType } from '@/types';
 import { createContext } from 'react';
 
 // Todo context

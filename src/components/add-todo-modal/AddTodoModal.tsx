@@ -1,0 +1,375 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: ignored some biome warning from this entire file by the developer */
+import { todoSchema, type TodoFormInputs } from '@/config/todo/todoValidationSchema';
+import { currentSelectedUserId } from '@/redux/features/auth/auth-slice/authSlice';
+import {
+	useAddCategoryMutation,
+	useCreateTodoMutation,
+	useLazyGetCategoriesQuery,
+} from '@/redux/features/todo/todo.api';
+import { useAppSelector } from '@/redux/hooks';
+import type { CategoryType, PriorityType } from '@/types';
+import { extractDescriptionFromMarkdown } from '@/utils/markdown-utils/extractDescription';
+import { extractTitleFromMarkdownContent } from '@/utils/markdown-utils/extractTitle';
+import { zodResolver } from '@hookform/resolvers/zod';
+import MDEditor from '@uiw/react-md-editor';
+import { Plus, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+// Category form type
+type CategoryFormInputs = {
+	name: string;
+	color: string;
+};
+const AddTodoModal = ({ onClose, isOpen }: { onClose: () => void; isOpen: boolean }) => {
+	const [createTodo, { isLoading, isError }] = useCreateTodoMutation();
+	const userId = useAppSelector(currentSelectedUserId);
+	// const { data } = useGetCategoriesQuery();
+	// lazy fetching categories only when needed
+	const [getCategories, { data }] = useLazyGetCategoriesQuery();
+	const [addCategory, { isLoading: isAddingCategory }] = useAddCategoryMutation();
+
+	useEffect(() => {
+		if (isOpen && !data) {
+			getCategories();
+		}
+	}, [isOpen, getCategories, data]);
+	// filtering categories to show user specific categories
+	const userSpecificCategories = data?.categories?.filter((category) => category.userId === userId);
+
+	// Modal state
+	const [showCategoryModal, setShowCategoryModal] = useState(false);
+	// Markdown editor state
+	const [markdownContent, setMarkdownContent] = useState('');
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+		setValue,
+		watch,
+	} = useForm<TodoFormInputs>({
+		resolver: zodResolver(todoSchema),
+		defaultValues: {
+			title: '',
+			description: '',
+			priority: 'low',
+			category: '',
+			dueDate: '',
+			completed: false,
+		},
+	});
+
+	// Category form
+	const {
+		register: registerCategory,
+		handleSubmit: handleSubmitCategory,
+		formState: { errors: categoryErrors },
+		reset: resetCategory,
+		watch: watchCategory,
+	} = useForm<CategoryFormInputs>({
+		defaultValues: {
+			name: '',
+			color: '#3b82f6', // Default blue color
+		},
+	});
+
+	const selectedPriority = watch('priority');
+	const selectedCategory = watch('category');
+	const selectedColor = watchCategory('color');
+
+	// handle markdown content change
+	// when user types anything using the markdown editor, typed things will come as 'value' and then
+	//  it will set into markdown content state as content
+	const handleMarkdownContentChange = (value?: string) => {
+		const content = value || '';
+		setMarkdownContent(content);
+
+		// Extract title and description from markdown and update form
+		const extractedTitle = extractTitleFromMarkdownContent(content);
+		const extractedDescription = extractDescriptionFromMarkdown(content);
+
+		setValue('title', extractedTitle);
+		setValue('description', extractedDescription);
+	};
+
+	const onSubmit = async (payload: TodoFormInputs) => {
+		// Extract final title and description from current markdown content
+		const finalTitle = extractTitleFromMarkdownContent(markdownContent);
+		const finalDescription = extractDescriptionFromMarkdown(markdownContent);
+
+		const finalPayload = {
+			...payload,
+			title: finalTitle,
+			description: finalDescription,
+			completed: payload.completed ?? false,
+			userId: userId,
+		};
+		try {
+			await createTodo(finalPayload).unwrap();
+
+			reset(); // reset form after successful creation
+			setMarkdownContent(''); //reset markdown content manually
+			onClose();
+			toast.success('Todo created successfully', { duration: 2000 });
+		} catch (error) {
+			console.error('Failed to create todo:', error);
+			toast.error('Todo creation failed.!', { duration: 2000 });
+		}
+	};
+
+	// Handle category change
+	const handleCategoryChange = (value: string) => {
+		if (value === '__new__') {
+			setShowCategoryModal(true);
+		} else {
+			setValue('category', value);
+		}
+	};
+
+	// Handle category creation
+	const onCategorySubmit = async (payload: CategoryFormInputs) => {
+		try {
+			const newCat = await addCategory({
+				name: payload.name,
+				color: payload.color,
+				userId,
+			}).unwrap();
+
+			setValue('category', newCat.id);
+			toast.success('Category created successfully!');
+			setShowCategoryModal(false);
+			resetCategory();
+		} catch (error) {
+			console.error('Failed to create category:', error);
+			toast.error('Failed to create category');
+		}
+	};
+
+	const closeCategoryModal = () => {
+		setShowCategoryModal(false);
+		resetCategory();
+	};
+	return (
+		<>
+			<Card className='bg-zinc-900 border-zinc-700 text-zinc-200'>
+				<CardHeader>
+					<CardTitle>Add New Todo</CardTitle>
+				</CardHeader>
+				<CardContent className='space-y-4'>
+					<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+						{/* Title */}
+						{/* <div className='space-y-1'>
+							<Label htmlFor='title' className='text-sm'>
+								Title
+							</Label>
+							<Input
+								id='title'
+								placeholder='Enter todo title'
+								className='bg-zinc-800 border-zinc-700 py-5'
+								{...register('title')}
+							/>
+							{errors.title && <p className='text-red-500 text-sm'>{errors.title.message}</p>}
+						</div> */}
+
+						{/* Description */}
+						{/* <div className='space-y-1'>
+							<Label htmlFor='description' className='text-sm'>
+								Description
+							</Label>
+							<Input
+								id='description'
+								placeholder='Optional description'
+								className='bg-zinc-800 border-zinc-700 py-5'
+								{...register('description')}
+							/>
+						</div> */}
+						{/* Markdown Editor for Title and Description */}
+						<div className='space-y-1'>
+							<Label className='text-sm'>Content (Enter title in the first line, then add description below)</Label>
+							<div className='rounded-lg overflow-hidden border border-zinc-700'>
+								<MDEditor
+									value={markdownContent}
+									onChange={handleMarkdownContentChange}
+									preview='edit'
+									hideToolbar={false}
+									textareaProps={{
+										placeholder: '# Enter your todo title here\n\nAdd your description here with markdown support...',
+										style: {
+											fontSize: 14,
+											backgroundColor: '#27272a',
+											color: '#d4d4d8',
+										},
+									}}
+									height={200}
+									data-color-mode='dark'
+								/>
+							</div>
+							<p className='text-xs text-zinc-300'>
+								Tip: Start with # for the title, then add your description below with full markdown support
+							</p>
+						</div>
+						{/* Priority */}
+						<div className='space-y-1'>
+							<Label htmlFor='priority' className='text-sm text-zinc-100'>
+								Priority
+							</Label>
+							<Select value={selectedPriority} onValueChange={(value) => setValue('priority', value as PriorityType)}>
+								<SelectTrigger aria-label='Todo priority' className='bg-zinc-800 border-zinc-600 w-full py-5'>
+									<SelectValue placeholder='Select priority' />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='low'>Low</SelectItem>
+									<SelectItem value='medium'>Medium</SelectItem>
+									<SelectItem value='high'>High</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Category */}
+						<div className='space-y-1'>
+							<Label htmlFor='category' className='text-sm text-zinc-100'>
+								Category
+							</Label>
+							<Select value={selectedCategory} onValueChange={handleCategoryChange}>
+								<SelectTrigger aria-label='Todo category' className='bg-zinc-800 border-zinc-600 w-full py-5'>
+									<span className='text-zinc-200'>
+										<SelectValue placeholder='Select category' />
+									</span>
+								</SelectTrigger>
+								<SelectContent>
+									{userSpecificCategories?.map((cat: CategoryType) => (
+										<SelectItem key={cat.id} value={cat.id}>
+											<div className='flex items-center gap-2'>
+												<div className='w-3 h-3 rounded-full' style={{ backgroundColor: cat.color }} />
+												{cat.name}
+											</div>
+										</SelectItem>
+									))}
+									<SelectItem value='__new__'>
+										<div className='flex items-center gap-2'>
+											<Plus className='w-4 h-4' />
+											Add new category
+										</div>
+									</SelectItem>
+								</SelectContent>
+							</Select>
+							{errors.category && <p className='text-red-500 text-sm'>{errors.category.message}</p>}
+						</div>
+
+						{/* Due Date */}
+						<div className='space-y-1'>
+							<Label htmlFor='dueDate' className='text-sm text-zinc-100'>
+								Due Date
+							</Label>
+							<Input type='date' id='dueDate' className='bg-zinc-800 border-zinc-600 py-5' {...register('dueDate')} />
+							{errors.dueDate && <p className='text-red-500 text-sm'>{errors.dueDate.message}</p>}
+						</div>
+
+						<Button type='submit' className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5' disabled={isLoading}>
+							{isLoading ? 'Adding...' : 'Add Todo'}
+						</Button>
+						<Button onClick={onClose} className='w-full text-zinc-200 bg-zinc-800 cursor-pointer py-5'>
+							Cancel
+						</Button>
+
+						{isError && <p className='text-red-500 text-sm'>Failed to create todo. Try again!</p>}
+					</form>
+				</CardContent>
+			</Card>
+
+			{/* Category Creation Modal */}
+			{showCategoryModal && (
+				<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+					<div className='bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md mx-4'>
+						<div className='flex items-center justify-between mb-4'>
+							<h2 className='text-lg font-semibold text-zinc-200'>Create New Category</h2>
+							<Button
+								variant='ghost'
+								size='sm'
+								onClick={closeCategoryModal}
+								className='text-zinc-400 hover:text-zinc-200 p-1'>
+								<X className='w-4 h-4' />
+							</Button>
+						</div>
+
+						<form onSubmit={handleSubmitCategory(onCategorySubmit)} className='space-y-4'>
+							{/* Category Name */}
+							<div className='space-y-1'>
+								<Label htmlFor='categoryName' className='text-sm text-zinc-200'>
+									Category Name
+								</Label>
+								<Input
+									id='categoryName'
+									placeholder='Enter category name'
+									className='bg-zinc-800 border-zinc-700 py-3'
+									{...registerCategory('name', { required: 'Category name is required' })}
+								/>
+								{categoryErrors.name && <p className='text-red-500 text-sm'>{categoryErrors.name.message}</p>}
+							</div>
+
+							{/* Category Color */}
+							<div className='space-y-1'>
+								<Label htmlFor='categoryColor' className='text-sm text-zinc-200'>
+									Category Color
+								</Label>
+								<div className='flex items-center gap-3'>
+									<input
+										id='categoryColor'
+										type='color'
+										className='w-12 h-10 rounded border border-zinc-700 bg-zinc-800 cursor-pointer'
+										{...registerCategory('color')}
+									/>
+									<Input
+										placeholder='#3b82f6'
+										value={selectedColor}
+										onChange={(e) => registerCategory('color').onChange(e)}
+										className='bg-zinc-800 border-zinc-700 py-3 flex-1'
+									/>
+								</div>
+								{categoryErrors.color && <p className='text-red-500 text-sm'>{categoryErrors.color.message}</p>}
+							</div>
+
+							{/* Color Preview */}
+							<div className='flex items-center gap-2 text-sm text-zinc-400'>
+								<span>Preview:</span>
+								<div className='flex items-center gap-2'>
+									<div
+										className='w-4 h-4 rounded-full border border-zinc-600'
+										style={{ backgroundColor: selectedColor }}
+									/>
+									<span className='text-zinc-200'>Sample Category</span>
+								</div>
+							</div>
+
+							<div className='flex gap-3 pt-2'>
+								<Button
+									type='button'
+									variant='outline'
+									onClick={closeCategoryModal}
+									className='flex-1 bg-transparent border-zinc-700 text-zinc-200 hover:bg-zinc-800'>
+									Cancel
+								</Button>
+								<Button
+									type='submit'
+									disabled={isAddingCategory}
+									className='flex-1 bg-blue-600 hover:bg-blue-700 text-white'>
+									{isAddingCategory ? 'Creating...' : 'Create Category'}
+								</Button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
+		</>
+	);
+};
+
+export default AddTodoModal;

@@ -1,7 +1,7 @@
 import { TodoContext } from '@/context';
 import { db } from '@/db/db';
 import { useAuth } from '@/hooks/useAuth';
-import type { DecryptedTodoType } from '@/types/types';
+import type { DecryptedTodoType } from '@/types';
 import { decryptString } from '@/utils/dcryptString';
 import { encryptString } from '@/utils/encryptString';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -40,7 +40,6 @@ const TodoProvider = ({ children }: { children: React.ReactNode }) => {
 			const decrypted = JSON.parse(decryptString(todo.encryptedData, user.email));
 			return { ...decrypted, id: todo.id };
 		});
-		// console.log(dcryptedTodo);
 		return dcryptedTodos;
 	}, [user?.id]);
 

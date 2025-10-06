@@ -1,80 +1,146 @@
+import SEO from '@/components/seo/SEO';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
-import type React from 'react';
-import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import {
+	registerUserValidationSchema,
+	type RegisterUserFormDataType,
+} from '@/config/auth/registerUserValidationSchema';
+import { registerNewUser } from '@/redux/features/auth/auth-slice/authSlice';
+import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
+import { useAppDispatch } from '@/redux/hooks';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const Register = () => {
-	const { register } = useAuth();
-	const navigate = useNavigate();
+	// const { register } = useAuth();
+	// const navigate = useNavigate();
 
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [message, setMessage] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
+	// const [email, setEmail] = useState('');
+	// const [password, setPassword] = useState('');
+	// const [message, setMessage] = useState('');
+	// const [isLoading, setIsLoading] = useState(false);
 
 	// submit handler
-	const handleSubmit = async (event: React.FormEvent) => {
-		event.preventDefault();
-		setIsLoading(true);
+	// const handleSubmit = async (event: React.FormEvent) => {
+	// 	event.preventDefault();
+	// 	setIsLoading(true);
+	// 	try {
+	// 		await register(email, password);
+	// 		setMessage('User Registration Successful');
+
+	// 		setEmail('');
+	// 		setPassword('');
+
+	// 		// clear message after 2 seconds and navigate user to login page
+	// 		setTimeout(() => {
+	// 			navigate('/login');
+	// 			setMessage('');
+	// 		}, 2000);
+	// 	} catch (error: unknown) {
+	// 		console.error(error);
+	// 		setMessage((error as Error).message || 'Failed to register user.!');
+	// 		setTimeout(() => setMessage(''), 2000);
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
+
+	// upgraded version with proper api calling
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterUserFormDataType>({
+		resolver: zodResolver(registerUserValidationSchema),
+	});
+
+	// using mutation logic from rtk query
+	const [registerUser, { isLoading, isError }] = useRegisterUserMutation();
+	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
+
+	// submit handler react hook form
+	const onSubmit: SubmitHandler<RegisterUserFormDataType> = async (payload: RegisterUserFormDataType) => {
 		try {
-			await register(email, password);
-			setMessage('User Registration Successful');
-
-			setEmail('');
-			setPassword('');
-
-			// clear message after 2 seconds and navigate user to login page
-			setTimeout(() => {
-				navigate('/login');
-				setMessage('');
-			}, 2000);
+			const res = await registerUser(payload).unwrap();
+			toast.success(res.message, { duration: 2000 });
+			navigate('/todo');
+			dispatch(registerNewUser(res));
 		} catch (error: unknown) {
-			console.error(error);
-			setMessage((error as Error).message || 'Failed to register user.!');
-			setTimeout(() => setMessage(''), 2000);
-		} finally {
-			setIsLoading(false);
+			console.error((error as Error).message || 'Registration Failed');
+			toast.error((error as Error).message || 'User registration failed');
 		}
 	};
 
 	return (
-		<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
-			<Card className='w-full max-w-lg mx-auto mt-10 shadow-xl rounded-2xl'>
-				<CardHeader>
-					<CardTitle className='text-xl'>Register</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<form onSubmit={handleSubmit} className='space-y-4'>
-						<Input placeholder='Email' type='email' required value={email} onChange={(e) => setEmail(e.target.value)} />
-						<Input
-							placeholder='Password'
-							type='password'
-							required
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-						/>
-						<Button type='submit' className='w-full'>
-							{isLoading ? 'Registering...' : '	Register'}
-						</Button>
+		<>
+			<SEO
+				title='Register'
+				description='Create your account on Lazy Todo to start tracking tasks, setting priorities and organizing categories.'
+			/>
+			<section className='w-full h-screen flex items-center justify-center bg-zinc-900'>
+				<Card className='w-full max-w-lg mx-auto mt-10 shadow-xl rounded-2xl'>
+					<CardHeader>
+						<CardTitle className='text-xl'>Register</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+							{/* first name */}
+							<Label htmlFor='first-name'>First Name</Label>
+							<Input placeholder='Enter Your First Name' type='text' {...register('firstName', { required: true })} />
+							{errors.firstName && <p className='text-red-600 font-medium text-sm'>{errors.firstName.message}</p>}
 
-						{message && <p className='text-sm text-center mt-2'>{message}</p>}
-					</form>
+							{/* last name */}
+							<Label htmlFor='last-name'>Last Name</Label>
+							<Input placeholder='Enter Your Last Name' type='text' {...register('lastName', { required: true })} />
+							{errors.lastName && <p className='text-red-600 font-medium text-sm'>{errors.lastName.message}</p>}
 
-					<div className='pt-5'>
-						<p className='text-xs'>
-							Already have an account?{' '}
-							<Link to='/login' className='font-semibold'>
-								Login
-							</Link>
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-			;
-		</section>
+							{/* user name */}
+							<Label htmlFor='user-name'>User Name</Label>
+							<Input
+								placeholder='Enter User Name (ironman)'
+								type='text'
+								{...register('username', { required: true })}
+							/>
+							{errors.username && <p className='text-red-600 font-medium text-sm'>{errors.username.message}</p>}
+
+							{/* email */}
+							<Label htmlFor='email'>Email</Label>
+							<Input placeholder='Enter Your Email' type='email' {...register('email', { required: true })} />
+							{errors.email && <p className='text-red-600 font-medium text-sm'>{errors.email.message}</p>}
+
+							{/* password */}
+							<Label htmlFor='password'>Password</Label>
+							<Input placeholder='Enter Your Password' type='password' {...register('password', { required: true })} />
+							{errors.password && <p className='text-red-600 font-medium text-sm'>{errors.password.message}</p>}
+
+							{/* submit button */}
+							<Button type='submit' className='w-full'>
+								{isLoading ? 'Registering...' : 'Register'}
+							</Button>
+						</form>
+						{/* handling error */}
+						{isError && <p className='text-red-600 text-sm mt-2'>Something went wrong while trying to register..!</p>}
+
+						<div className='pt-5'>
+							<p className='text-xs'>
+								Already have an account?{' '}
+								<Link to='/login' className='font-semibold'>
+									Login
+								</Link>
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+				;
+			</section>
+		</>
 	);
 };
 
