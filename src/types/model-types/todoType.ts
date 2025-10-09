@@ -10,7 +10,7 @@ export type TodoType = {
 	id: string;
 	title: string;
 	description: string;
-	completed: boolean;
+	completed: boolean | number;
 	priority: PriorityType;
 	category: string;
 	dueDate: string;
